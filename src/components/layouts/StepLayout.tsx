@@ -29,9 +29,15 @@ const StepLayout: React.FC<StepProps> = ({
                 <h3 className="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
                     {title}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-                    {description}
-                </p>
+                {typeof description === "string" ? (
+                    <p className="mb-4 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
+                        {description}
+                    </p>
+                ) : (
+                    <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
+                        {description}
+                    </div>
+                )}
             </div>
             <div className="flex justify-center mt-4">
                 <Button size="sm" variant="outline" endIcon={endIcon} onClick={onNextStep} disabled={nextBtnDisabled}>

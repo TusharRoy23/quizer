@@ -4,9 +4,9 @@ import { ArrowRight } from "@/icons";
 import SelectInput from "../form/SelectInput";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { selectDepartment, setDepartmentList } from "@/store/reducers/stepSlice";
+import { selectDepartment, selectTopics, setDepartmentList, setTopicList } from "@/store/reducers/stepSlice";
 import { useEffect } from "react";
-import { fetchDepartments } from "@/app/services/departmentService";
+import { fetchDepartments } from "@/services/departmentService";
 
 export default function DepartmentStep({ onNextStep, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
@@ -23,6 +23,8 @@ export default function DepartmentStep({ onNextStep, onPreviousStep }: StepProps
 
     const onSelectDept = (dept: Department) => {
         dispatch(selectDepartment(dept));
+        dispatch(selectTopics([]));
+        dispatch(setTopicList([]));
     }
 
     return (

@@ -3,10 +3,12 @@ import Department from "@/components/steps/Department";
 import Difficulty from "@/components/steps/Difficulty";
 import Intro from "@/components/steps/Intro";
 import QuestionCount from "@/components/steps/QuestionCount";
+import Summary from "@/components/steps/Summary";
 import Timer from "@/components/steps/Timer";
 import Topics from "@/components/steps/Topics";
 import { RootState } from "@/store";
 import { setStep } from "@/store/reducers/stepSlice";
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 
 enum STEPS {
@@ -21,6 +23,7 @@ enum STEPS {
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const stepHandler = (step: STEPS) => {
@@ -37,7 +40,9 @@ export default function Home() {
           {String(step) === STEPS.Difficulty && <Difficulty onNextStep={() => stepHandler(STEPS.QuestionCount)} onPreviousStep={() => stepHandler(STEPS.Topics)} />}
           {String(step) === STEPS.QuestionCount && <QuestionCount onNextStep={() => stepHandler(STEPS.Timer)} onPreviousStep={() => stepHandler(STEPS.Difficulty)} />}
           {String(step) === STEPS.Timer && <Timer onNextStep={() => stepHandler(STEPS.Start)} onPreviousStep={() => stepHandler(STEPS.QuestionCount)} />}
-          {String(step) === STEPS.Start}
+          {String(step) === STEPS.Start && <Summary onNextStep={() => {
+            router.push("/quiz");
+          }} onPreviousStep={() => stepHandler(STEPS.Timer)} />}
         </div>
       </main>
     </div>

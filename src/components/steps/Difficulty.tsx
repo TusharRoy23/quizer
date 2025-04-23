@@ -1,13 +1,38 @@
-import { StepProps } from "@/types";
+import { Difficulty, StepProps } from "@/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import SelectInput from "../form/SelectInput";
+import { setDifficulty } from "@/store/reducers/stepSlice";
 
-export default function Difficulty({ onNextStep, onPreviousStep }: StepProps) {
+export default function DifficultyLevel({ onNextStep, onPreviousStep }: StepProps) {
+    const dispatch = useDispatch();
+    const difficulty: Difficulty[] = [
+        { name: "Easy", value: "easy" },
+        { name: "Medium", value: "medium" },
+        { name: "Hard", value: "hard" },
+    ];
+    const selectedDifficulty = useSelector((state: RootState) => state.steps.form.difficulty) || difficulty[0];
+    const onSelect = (difficulty: Difficulty) => {
+        dispatch(setDifficulty(difficulty));
+    }
+
     return (
         <>
             <StepLayout
                 title={"Select Difficulty Level"}
-                description={""}
+                description={
+                    <SelectInput
+                        label="Select your department"
+                        placeholder="--Select--"
+                        options={difficulty}
+                        getOptionValue={(dept) => dept.value}
+                        getOptionLabel={(dept) => dept.name}
+                        onChange={onSelect}
+                        value={selectedDifficulty}
+                    />
+                }
                 btnLabel={"Total Questions"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}

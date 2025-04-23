@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from "@/icons";
+import { ChevronDown } from "@/icons";
 import Label from "./Label";
 import Select from "./Select";
 
@@ -49,7 +49,7 @@ const SelectInput = <T,>({
           defaultValue={value ? String(getOptionValue(value)) : undefined}
         />
         <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-          <ChevronDownIcon />
+          <ChevronDown />
         </span>
       </div>
     </div>

@@ -6,6 +6,7 @@ import QuestionCount from "@/components/steps/QuestionCount";
 import Summary from "@/components/steps/Summary";
 import Timer from "@/components/steps/Timer";
 import Topics from "@/components/steps/Topics";
+import UserInfo from "@/components/steps/UserInfo";
 import { RootState } from "@/store";
 import { setStep } from "@/store/reducers/stepSlice";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 enum STEPS {
   Intro = 'intro',
+  UserInfo = 'userinfo',
   Department = 'department',
   Topics = 'topics',
   Difficulty = 'difficulty',
@@ -34,8 +36,9 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-          {String(step) === STEPS.Intro && <Intro onNextStep={() => stepHandler(STEPS.Department)} />}
-          {String(step) === STEPS.Department && <Department onNextStep={() => stepHandler(STEPS.Topics)} onPreviousStep={() => stepHandler(STEPS.Intro)} />}
+          {String(step) === STEPS.Intro && <Intro onNextStep={() => stepHandler(STEPS.UserInfo)} />}
+          {String(step) === STEPS.UserInfo && <UserInfo onNextStep={() => stepHandler(STEPS.Department)} onPreviousStep={() => stepHandler(STEPS.Intro)} />}
+          {String(step) === STEPS.Department && <Department onNextStep={() => stepHandler(STEPS.Topics)} onPreviousStep={() => stepHandler(STEPS.UserInfo)} />}
           {String(step) === STEPS.Topics && <Topics onNextStep={() => stepHandler(STEPS.Difficulty)} onPreviousStep={() => stepHandler(STEPS.Department)} />}
           {String(step) === STEPS.Difficulty && <Difficulty onNextStep={() => stepHandler(STEPS.QuestionCount)} onPreviousStep={() => stepHandler(STEPS.Topics)} />}
           {String(step) === STEPS.QuestionCount && <QuestionCount onNextStep={() => stepHandler(STEPS.Timer)} onPreviousStep={() => stepHandler(STEPS.Difficulty)} />}

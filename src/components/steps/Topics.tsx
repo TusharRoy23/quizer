@@ -50,6 +50,7 @@ export default function Topics({ onNextStep, onPreviousStep }: StepProps) {
                 endIcon={<ArrowRight />}
                 onPreviousStep={onPreviousStep}
                 onNextStep={onNextStep}
+                nextBtnDisabled={selectedTopics.length ? false : true}
             />
         </>
     );

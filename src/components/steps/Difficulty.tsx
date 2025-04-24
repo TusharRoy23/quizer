@@ -13,7 +13,7 @@ export default function DifficultyLevel({ onNextStep, onPreviousStep }: StepProp
         { name: "Medium", value: "medium" },
         { name: "Hard", value: "hard" },
     ];
-    const selectedDifficulty = useSelector((state: RootState) => state.steps.form.difficulty) || difficulty[0];
+    const selectedDifficulty = useSelector((state: RootState) => state.steps.form.difficulty);
     const onSelect = (difficulty: Difficulty) => {
         dispatch(setDifficulty(difficulty));
     }
@@ -37,6 +37,7 @@ export default function DifficultyLevel({ onNextStep, onPreviousStep }: StepProp
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}
+                nextBtnDisabled={selectedDifficulty ? false : true}
             />
         </>
     );

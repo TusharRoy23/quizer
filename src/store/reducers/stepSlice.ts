@@ -2,7 +2,13 @@ import { Department, Difficulty, ObjectType, Topic } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+interface UserInfo {
+    name: string;
+    email: string;
+}
+
 interface IForm {
+    userInfo: UserInfo | undefined;
     department: Department | undefined;
     topics: Topic[];
     difficulty: Difficulty | undefined;
@@ -20,6 +26,7 @@ interface IStep {
 const initialState: IStep = {
     step: 'intro',
     form: {
+        userInfo: undefined,
         department: undefined,
         topics: [],
         difficulty: undefined,
@@ -36,6 +43,9 @@ export const stepsSlice = createSlice({
     reducers: {
         setStep(state, action: PayloadAction<string>) {
             state.step = action.payload;
+        },
+        setUserInfo(state, action: PayloadAction<UserInfo>) {
+            state.form.userInfo = action.payload;
         },
         selectDepartment(state, action: PayloadAction<Department>) {
             state.form.department = action.payload;
@@ -63,6 +73,7 @@ export const stepsSlice = createSlice({
 
 export const {
     setStep,
+    setUserInfo,
     selectDepartment,
     setDepartmentList,
     selectTopics,

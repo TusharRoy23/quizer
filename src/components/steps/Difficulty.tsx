@@ -6,7 +6,7 @@ import { RootState } from "@/store";
 import SelectInput from "../form/SelectInput";
 import { setDifficulty } from "@/store/reducers/stepSlice";
 
-export default function DifficultyLevel({ onNextStep, onPreviousStep }: StepProps) {
+export default function DifficultyLevel({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
     const difficulty: Difficulty[] = [
         { name: "Easy", value: "easy" },
@@ -24,7 +24,7 @@ export default function DifficultyLevel({ onNextStep, onPreviousStep }: StepProp
                 title={"Select Difficulty Level"}
                 description={
                     <SelectInput
-                        label="Select your department"
+                        label="Level"
                         placeholder="--Select--"
                         options={difficulty}
                         getOptionValue={(dept) => dept.value}

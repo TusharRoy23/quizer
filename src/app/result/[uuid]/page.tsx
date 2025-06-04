@@ -2,10 +2,32 @@
 import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { CheckCircle } from "@/icons";
-import { useRouter } from "next/navigation";
+import { QuizService } from "@/services/quizService";
+import { QuizResult } from "@/types";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ResultPage() {
     const router = useRouter();
+    const params = useParams();
+    const uuid = params?.uuid as string || "";
+    const [result, setResult] = useState<QuizResult>();
+
+    const getQuizResult = async (uuid: string) => {
+        const result = await QuizService.getQuizResult(uuid as string);
+        if (result) {
+            console.log("Quiz Result:", result);
+            setResult(result);
+        } else {
+            console.error("Failed to fetch quiz result");
+        }
+    }
+
+    useEffect(() => {
+        if (uuid) {
+            getQuizResult(uuid);
+        }
+    }, [uuid]);
     return (
         <>
             <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
@@ -26,7 +48,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            01:00
+                                            {result?.timer} min
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -38,7 +60,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            Hard
+                                            {result?.difficulty.toLocaleUpperCase()}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -50,7 +72,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            2
+                                            {result?.question_count}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -62,7 +84,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            2
+                                            {result?.total_answers}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -74,7 +96,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            2
+                                            {result?.total_correct}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -86,7 +108,7 @@ export default function ResultPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 text-start">
                                         <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                            100%
+                                            {result?.score}%
                                         </div>
                                     </TableCell>
                                 </TableRow>

@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Table, TableBody, TableRow, TableCell } from "../ui/table";
-import { StepProps } from "@/types";
+import { QuizRequest, StepProps, Topic } from "@/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
+import { useRouter } from "next/navigation";
+import { RootState } from "@/store";
+import { QuizService } from "@/services/quizService";
 
 const SummaryData = () => {
-    const selector = useSelector((state: any) => state.steps);
+    const selector = useSelector((state: RootState) => state.steps);
     const { department, topics, difficulty, questionCount, timer } = selector.form;
 
     return (
@@ -85,15 +88,49 @@ const SummaryData = () => {
     );
 };
 
-export default function Summary({ onNextStep, onPreviousStep }: StepProps) {
+export default function Summary({ onPreviousStep }: StepProps) {
+    const router = useRouter();
+    const selector = useSelector((state: RootState) => state.steps);
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const generateQuiz = async () => {
+        const { form } = selector;
+        setIsGenerating(true);
+        if (!form.department || !form.topics || !form.difficulty || !form.questionCount) {
+            console.error("Please fill all the required fields before generating the quiz.");
+            setIsGenerating(false);
+            return;
+        }
+        try {
+            const { department, topics, difficulty, questionCount, timer, userInfo } = form;
+            const payload: QuizRequest = {
+                department: department?.uuid,
+                topics: topics?.map((topic: Topic) => topic.uuid),
+                difficulty: difficulty?.value,
+                question_count: +questionCount?.value,
+                timer: timer,
+                name: userInfo?.name,
+                email: userInfo?.email,
+            }
+            const quizUuid = await QuizService.generateQuiz(payload);
+            if (quizUuid) {
+                router.push(`/quiz/${quizUuid}`);
+            }
+        } catch (error) {
+            setIsGenerating(false);
+        }
+    }
+
     return (
         <StepLayout
             title={"Summary"}
             description={<SummaryData />}
-            btnLabel={"Let's Start"}
-            onNextStep={onNextStep}
+            btnLabel={isGenerating ? "Starting..." : "Let's Start"}
+            onNextStep={() => generateQuiz()}
             onPreviousStep={onPreviousStep}
             endIcon={<ArrowRight />}
+            nextBtnDisabled={isGenerating}
+            prevBtnDisabled={isGenerating}
         />
     );
 }

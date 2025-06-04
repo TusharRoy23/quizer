@@ -8,13 +8,13 @@ import { selectDepartment, selectTopics, setDepartmentList, setTopicList } from 
 import { useEffect } from "react";
 import { fetchDepartments } from "@/services/departmentService";
 
-export default function DepartmentStep({ onNextStep, onPreviousStep }: StepProps) {
+export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
     const departmentList: Department[] = useSelector((state: RootState) => state.steps.departmentList) || [];
 
     useEffect(() => {
         const loadDepartments = async () => {
-            const departments = await fetchDepartments();
+            const departments: Department[] = await fetchDepartments();
             dispatch(setDepartmentList(departments));
         };
         loadDepartments();

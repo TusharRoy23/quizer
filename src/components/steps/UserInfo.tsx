@@ -36,7 +36,7 @@ function UserInfoData({ formData, onFormChange }: { formData: UserInfoForm, onFo
     );
 }
 
-export default function UserInfo({ onNextStep, onPreviousStep }: StepProps) {
+export default function UserInfo({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const userInfo = useSelector((state: RootState) => state.steps.form.userInfo);
     const dispatch = useDispatch();
     const formData: UserInfoForm = {

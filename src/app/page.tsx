@@ -43,9 +43,7 @@ export default function Home() {
           {String(step) === STEPS.Difficulty && <Difficulty onNextStep={() => stepHandler(STEPS.QuestionCount)} onPreviousStep={() => stepHandler(STEPS.Topics)} />}
           {String(step) === STEPS.QuestionCount && <QuestionCount onNextStep={() => stepHandler(STEPS.Timer)} onPreviousStep={() => stepHandler(STEPS.Difficulty)} />}
           {String(step) === STEPS.Timer && <Timer onNextStep={() => stepHandler(STEPS.Start)} onPreviousStep={() => stepHandler(STEPS.QuestionCount)} />}
-          {String(step) === STEPS.Start && <Summary onNextStep={() => {
-            router.push("/quiz");
-          }} onPreviousStep={() => stepHandler(STEPS.Timer)} />}
+          {String(step) === STEPS.Start && <Summary onPreviousStep={() => stepHandler(STEPS.Timer)} />}
         </div>
       </main>
     </div>

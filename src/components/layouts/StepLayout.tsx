@@ -9,6 +9,7 @@ interface StepProps {
     btnLabel: string,
     backBtn?: boolean,
     nextBtnDisabled?: boolean,
+    prevBtnDisabled?: boolean,
     onNextStep: () => void,
     onPreviousStep?: () => void
 }
@@ -20,6 +21,7 @@ const StepLayout: React.FC<StepProps> = ({
     btnLabel,
     backBtn = true,
     nextBtnDisabled = false,
+    prevBtnDisabled = false,
     onNextStep,
     onPreviousStep
 }) => {
@@ -46,7 +48,7 @@ const StepLayout: React.FC<StepProps> = ({
             </div>
             {backBtn && (
                 <div className="flex justify-center mt-4">
-                    <Button size="sm" variant="outline" startIcon={<ChevronLeft />} onClick={onPreviousStep}>
+                    <Button size="sm" variant="outline" startIcon={<ChevronLeft />} onClick={onPreviousStep} disabled={prevBtnDisabled}>
                         Back
                     </Button>
                 </div>

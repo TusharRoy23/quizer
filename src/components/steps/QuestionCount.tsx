@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { setQuestionCount } from "@/store/reducers/stepSlice";
 
-export default function QuestionCount({ onNextStep, onPreviousStep }: StepProps) {
+export default function QuestionCount({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
     const questionCount = useSelector((state: RootState) => state.steps.form.questionCount) || 10;
     const questionCountArr: Array<ObjectType> = [

@@ -1,5 +1,5 @@
 export interface StepProps {
-    onNextStep: () => void,
+    onNextStep?: () => void,
     onPreviousStep?: () => void
 }
 
@@ -28,7 +28,34 @@ export interface Topic {
 export interface Quiz {
     uuid: string;
     question: string;
-    answer: string;
-    options: ObjectType[];
-    difficulty: Difficulty;
+    answer?: string;
+    selected_index?: number | number[];
+    options: string[];
+    question_type: "CHOICE" | "MULTIPLE_CHOICE";
+}
+
+export interface UserInfo {
+    name: string;
+    email: string;
+}
+
+export interface QuizRequest {
+    department: string | undefined;
+    topics: string[];
+    difficulty: string | undefined;
+    question_count: number | undefined;
+    timer: number;
+    name: string | undefined;
+    email: string | undefined;
+}
+
+export interface QuizResult {
+    uuid: string;
+    department: Department;
+    timer: number;
+    difficulty: string;
+    question_count: number;
+    score: boolean;
+    total_answers: number;
+    total_correct: number;
 }

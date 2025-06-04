@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import MultiSelect from "../form/MultiSelectInput";
 import { selectTopics } from "@/store/reducers/stepSlice";
 
-export default function Topics({ onNextStep, onPreviousStep }: StepProps) {
+export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
     const [topics, setTopics] = useState<Topic[]>([]);
     const selectedTopics = useSelector((state: RootState) => state.steps.form.topics) || [];

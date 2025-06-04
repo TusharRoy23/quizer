@@ -2,7 +2,7 @@ import { PaperPlaneIcon } from "@/icons";
 import StepLayout from "../layouts/StepLayout";
 import { StepProps } from "@/types";
 
-export default function Intro({ onNextStep }: StepProps) {
+export default function Intro({ onNextStep = () => { } }: StepProps) {
     return (
         <>
             <StepLayout

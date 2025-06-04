@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTimer } from "@/store/reducers/stepSlice";
 import { RootState } from "@/store";
 
-export default function Timer({ onNextStep, onPreviousStep }: StepProps) {
+export default function Timer({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const dispatch = useDispatch();
     const timer = useSelector((state: RootState) => state.steps.form.timer) || 1;

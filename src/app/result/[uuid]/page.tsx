@@ -14,13 +14,18 @@ export default function ResultPage() {
     const [result, setResult] = useState<QuizResult>();
 
     const getQuizResult = async (uuid: string) => {
-        const result = await QuizService.getQuizResult(uuid as string);
-        if (result) {
-            console.log("Quiz Result:", result);
-            setResult(result);
-        } else {
-            console.error("Failed to fetch quiz result");
+        try {
+            const result = await QuizService.getQuizResult(uuid as string);
+            if (result) {
+                setResult(result);
+            } else {
+                console.error("Failed to fetch quiz result");
+            }
+        } catch (error) {
+            console.log('error: ', error);
+
         }
+
     }
 
     useEffect(() => {

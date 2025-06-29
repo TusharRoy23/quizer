@@ -102,15 +102,13 @@ export default function Summary({ onPreviousStep }: StepProps) {
             return;
         }
         try {
-            const { department, topics, difficulty, questionCount, timer, userInfo } = form;
+            const { department, topics, difficulty, questionCount, timer } = form;
             const payload: QuizRequest = {
                 department: department?.uuid,
                 topics: topics?.map((topic: Topic) => topic.uuid),
                 difficulty: difficulty?.value,
                 question_count: +questionCount?.value,
-                timer: timer,
-                name: userInfo?.name,
-                email: userInfo?.email,
+                timer: timer
             }
             const quizUuid = await QuizService.generateQuiz(payload);
             if (quizUuid) {

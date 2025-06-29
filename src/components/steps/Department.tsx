@@ -18,7 +18,7 @@ export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep 
             dispatch(setDepartmentList(departments));
         };
         loadDepartments();
-    }, []);
+    }, [dispatch]);
     const department = useSelector((state: RootState) => state.steps.form.department);
 
     const onSelectDept = (dept: Department) => {

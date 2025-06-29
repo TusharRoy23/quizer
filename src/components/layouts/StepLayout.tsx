@@ -5,7 +5,8 @@ import { ChevronLeft } from "@/icons";
 interface StepProps {
     title: string;
     description: string | ReactNode;
-    endIcon: ReactNode,
+    endIcon?: ReactNode,
+    startIcon?: ReactNode,
     btnLabel: string,
     backBtn?: boolean,
     nextBtnDisabled?: boolean,
@@ -18,6 +19,7 @@ const StepLayout: React.FC<StepProps> = ({
     title,
     description,
     endIcon,
+    startIcon,
     btnLabel,
     backBtn = true,
     nextBtnDisabled = false,
@@ -42,7 +44,7 @@ const StepLayout: React.FC<StepProps> = ({
                 )}
             </div>
             <div className="flex justify-center mt-4">
-                <Button size="sm" variant="outline" endIcon={endIcon} onClick={onNextStep} disabled={nextBtnDisabled}>
+                <Button size="sm" variant="outline" endIcon={endIcon} startIcon={startIcon} onClick={onNextStep} disabled={nextBtnDisabled}>
                     {btnLabel}
                 </Button>
             </div>

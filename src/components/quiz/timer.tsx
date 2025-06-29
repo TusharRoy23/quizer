@@ -9,9 +9,11 @@ interface TimerProps {
 
 export default function Timer({ duration, onTimeUp }: TimerProps) {
     const [timeLeft, setTimeLeft] = useState(duration);
+    const [hasTimeUpFired, setHasTimeUpFired] = useState(false);
 
     useEffect(() => {
-        if (timeLeft <= 0) {
+        if (timeLeft <= 0 && !hasTimeUpFired) {
+            setHasTimeUpFired(true);
             onTimeUp();
             return;
         }

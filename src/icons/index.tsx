@@ -6,6 +6,9 @@ import ChevronRight from "./chevron-right.svg";
 import Clock from "./clock.svg";
 import CheckCircle from "./check-circle.svg";
 import CheckLine from "./check-line.svg";
+import File from "./file.svg";
+import Folder from "./folder.svg";
+import Grid from "./grid.svg";
 
 export {
     PaperPlaneIcon,
@@ -15,5 +18,8 @@ export {
     ChevronDown,
     Clock,
     CheckCircle,
-    CheckLine
+    CheckLine,
+    File,
+    Folder,
+    Grid
 }

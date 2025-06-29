@@ -1,6 +1,7 @@
 export interface StepProps {
     onNextStep?: () => void,
-    onPreviousStep?: () => void
+    onPreviousStep?: () => void,
+    isAuthenticated?: boolean;
 }
 
 export interface Department {
@@ -45,8 +46,6 @@ export interface QuizRequest {
     difficulty: string | undefined;
     question_count: number | undefined;
     timer: number;
-    name: string | undefined;
-    email: string | undefined;
 }
 
 export interface QuizResult {
@@ -55,6 +54,18 @@ export interface QuizResult {
     timer: number;
     difficulty: string;
     question_count: number;
+    score: boolean;
+    total_answers: number;
+    total_correct: number;
+}
+
+export interface QuizLog {
+    uuid: string;
+    department: Department;
+    timer: number;
+    difficulty: string;
+    question_count: number;
+    completed: boolean;
     score: boolean;
     total_answers: number;
     total_correct: number;

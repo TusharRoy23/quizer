@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { QuizService } from "../../../services/quizService";
-import { ObjectType, Quiz } from "@/types";
+import { Quiz } from "@/types";
 import Question from "@/components/quiz/question";
 import Button from "@/components/ui/button/Button";
 import { CheckLine, ChevronLeft, ChevronRight } from "@/icons";
@@ -9,10 +9,11 @@ import Timer from "@/components/quiz/timer";
 import { useSelector } from "react-redux";
 import { persistor, RootState } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function QuizPage() {
     const router = useParams();
+    const redirect = useRouter();
     const uuid = router?.uuid;
     const selector = useSelector((state: RootState) => state.steps.form);
 
@@ -35,7 +36,7 @@ export default function QuizPage() {
         if (response.length > 0) {
             setQuiz(response[0]);
         }
-        persistor.purge(); ``
+        persistor.purge();
     }
 
     const paginate = async (pageNum: number) => {
@@ -47,32 +48,38 @@ export default function QuizPage() {
         try {
             const response = await QuizService.submitQuiz(uuid as string);
             if (response) {
-                setIsLoading(false);
                 persistor.purge();
                 ClientDBService.clearAllQuizzes();
                 window.location.href = `/result/${uuid}`;
+                // redirect.push(`/result/${uuid}`);
             }
         } catch (error) {
+            setIsLoading(false);
+        } finally {
             setIsLoading(false);
         }
     }
 
     const onSelectAnswer = async (selectedIdx: number | number[]) => {
-        setQuiz((prev) => prev ? { ...prev, selected_index: selectedIdx } : prev);
-        const updatedQuiz = {
-            ...quiz,
-            uuid: quiz?.uuid || "",
-            selected_index: selectedIdx,
-            question: quiz?.question || "" // Ensure question is always a string
-        } as Quiz;
-        await ClientDBService.saveQuizAnswer(updatedQuiz);
-        if (typeof uuid !== "string") {
-            throw new Error("Invalid UUID");
+        try {
+            setQuiz((prev) => prev ? { ...prev, selected_index: selectedIdx } : prev);
+            const updatedQuiz = {
+                ...quiz,
+                uuid: quiz?.uuid || "",
+                selected_index: selectedIdx,
+                question: quiz?.question || "" // Ensure question is always a string
+            } as Quiz;
+            await ClientDBService.saveQuizAnswer(updatedQuiz);
+            if (typeof uuid !== "string") {
+                throw new Error("Invalid UUID");
+            }
+            await QuizService.saveQuiz(uuid, {
+                uuid: updatedQuiz.uuid,
+                answers: Array.isArray(selectedIdx) ? [...selectedIdx] : [selectedIdx]
+            });
+        } catch (error) {
+            console.log('error: ', error);
         }
-        await QuizService.saveQuiz(uuid, {
-            uuid: updatedQuiz.uuid,
-            answers: Array.isArray(selectedIdx) ? [...selectedIdx] : [selectedIdx]
-        });
     }
 
     useEffect(() => {

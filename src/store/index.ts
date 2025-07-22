@@ -1,15 +1,19 @@
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import stepsSlice from "./reducers/stepSlice";
+import authSlice from "./reducers/authSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore } from "redux-persist";
 
 const persistConfigStep = { key: "step", storage };
+const persistConfigAuth = { key: "auth", storage };
 
 const persistedStepReducer = persistReducer(persistConfigStep, stepsSlice);
+const persistedAuthReducer = persistReducer(persistConfigAuth, authSlice);
 
 const rootReducer = combineReducers({
-    steps: persistedStepReducer
+    steps: persistedStepReducer,
+    auth: persistedAuthReducer
 });
 
 export const store = configureStore({

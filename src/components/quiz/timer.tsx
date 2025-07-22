@@ -12,17 +12,23 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
     const [hasTimeUpFired, setHasTimeUpFired] = useState(false);
 
     useEffect(() => {
-        if (timeLeft <= 0 && !hasTimeUpFired) {
+        // Reset timer when duration changes (e.g., after page refresh)
+        setTimeLeft(duration);
+        setHasTimeUpFired(false);
+    }, [duration]);
+
+    useEffect(() => {
+        if (timeLeft < 0 && !hasTimeUpFired) {
             setHasTimeUpFired(true);
             onTimeUp();
             return;
         }
 
         const timerId = setInterval(() => {
-            setTimeLeft((prevTime) => prevTime - 1);
+            setTimeLeft(prev => prev - 1);
         }, 1000);
 
-        return () => clearInterval(timerId); // Cleanup on unmount
+        return () => clearInterval(timerId);
     }, [timeLeft, onTimeUp]);
 
     const formatTime = (seconds: number) => {
@@ -33,9 +39,9 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
 
     return (
         <div>
-            <Badge variant="light" color="info" startIcon={<Clock />}>
+            {timeLeft >= 0 && <Badge variant="light" color="info" startIcon={<Clock />}>
                 <h1 className=''>Time Left: {formatTime(timeLeft)}</h1>
-            </Badge>
+            </Badge>}
         </div>
     );
 }

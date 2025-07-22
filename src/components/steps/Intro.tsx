@@ -8,7 +8,7 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
             <StepLayout
                 title={"Welcome to Quizer!"}
                 description={"You can practice your test here."}
-                btnLabel={isAuthenticated ? "Let's Start" : "Sign in with google"}
+                btnLabel={isAuthenticated ? "Take a quiz" : "Sign in with google"}
                 backBtn={false}
                 onNextStep={onNextStep}
                 endIcon={isAuthenticated ? <PaperPlaneIcon /> : null}

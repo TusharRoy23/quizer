@@ -3,15 +3,16 @@ import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ArrowRight } from "@/icons";
 import { QuizService } from "@/services/quizService";
-import { QuizLog } from "@/types";
+import { QuizResult } from "@/types";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function GeneratedPage() {
-    const [logs, setLogs] = useState<QuizLog[]>([]);
+    const [logs, setLogs] = useState<QuizResult[]>([]);
+    const router = useRouter();
     const getQuizLogList = async () => {
         try {
             const logs = await QuizService.getQuizLogList();
-            console.log('logs: ', logs);
             setLogs(logs);
         } catch (error) {
 
@@ -102,7 +103,7 @@ export default function GeneratedPage() {
                                     </TableCell>
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                                         <Button size="sm" variant="outline" endIcon={<ArrowRight />} onClick={() => {
-                                            // router.push('/generated');
+                                            router.push(`/generated/questions/${log.uuid}`);
                                         }}>
                                             Revision
                                         </Button>

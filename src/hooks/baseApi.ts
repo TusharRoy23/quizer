@@ -1,6 +1,7 @@
+import { ClientDBService } from "@/services/clientDBService";
 import axios from "axios";
 
-const API_BASE_URL = `http://localhost:8000/`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/`;
 
 export const setAccessTokenExpiry = (timestamp: number) => {
     localStorage.setItem("accessTokenExpiry", timestamp.toString());
@@ -24,6 +25,12 @@ export const apiClient = axios.create({
     withCredentials: true,
 });
 
+const clearLocalStorageAndDB = () => {
+    localStorage.clear();
+    ClientDBService.clearAllQuizzes();
+    window.location.href = '/';
+};
+
 let refreshPromise: Promise<void> | null = null;
 
 const callRefreshToken = async () => {
@@ -36,8 +43,7 @@ const callRefreshToken = async () => {
                 }
             })
             .catch((err) => {
-                localStorage.clear();
-                window.location.href = '/';
+                clearLocalStorageAndDB();
                 throw err;
             })
             .finally(() => {
@@ -56,6 +62,9 @@ apiClient.interceptors.request.use(
         return config;
     },
     (error) => {
+        if (error.status === 401) {
+            clearLocalStorageAndDB();
+        }
         return Promise.reject(error);
     }
 )
@@ -65,6 +74,9 @@ apiClient.interceptors.response.use(
         return response.data;
     },
     (error) => {
+        if (error.status === 401) {
+            clearLocalStorageAndDB();
+        }
         return Promise.reject(error);
     }
 )

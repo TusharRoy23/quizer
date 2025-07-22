@@ -7,10 +7,8 @@ import Summary from "@/components/steps/Summary";
 import Timer from "@/components/steps/Timer";
 import Topics from "@/components/steps/Topics";
 import Button from "@/components/ui/button/Button";
-import { checkAuthentication } from "@/services/authService";
 import { RootState } from "@/store";
 import { setStep } from "@/store/reducers/stepSlice";
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { File } from "@/icons";
 import { useRouter } from "next/navigation";
@@ -28,39 +26,20 @@ enum STEPS {
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await checkAuthentication();
-
-        if (res?.authenticated) {
-          setIsAuthenticated(true);
-          localStorage.setItem("accessTokenExpiry", res.expiredAt.toString());
-          localStorage.setItem("accessToken", res.accessToken);
-        }
-      } catch (err) {
-        console.log("Not authenticated");
-      }
-    };
-    checkAuth();
-  }, []);
 
   const stepHandler = (step: STEPS) => {
     dispatch(setStep(step))
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:8000/user/auth/google`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/user/auth/google`;
   };
 
   return (
     <>
-      {/* <Header onClick={() => { }} onToggle={() => { }} /> */}
-
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
           <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">

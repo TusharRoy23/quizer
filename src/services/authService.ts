@@ -1,9 +1,19 @@
 import { apiClient } from '@/hooks/baseApi';
+import { Authentication } from '@/types';
 
-export const checkAuthentication = async (): Promise<any> => {
-    const response = await apiClient.get('user/auth/check');
-    if (response.status !== 200) {
-        throw new Error('Authentication check failed');
+export const AuthService = {
+    checkAuthentication: async () => {
+        const response = await apiClient.get<Authentication>('user/auth/check');
+        if (response.status !== 200) {
+            throw new Error('Authentication check failed');
+        }
+        return response.data;
+    },
+    logout: async () => {
+        const response = await apiClient.get('user/auth/logout');
+        if (response.status !== 200) {
+            throw new Error('Logout failed');
+        }
+        return response.data;
     }
-    return response.data;
-};
+}

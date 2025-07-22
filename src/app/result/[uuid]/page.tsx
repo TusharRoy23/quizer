@@ -23,7 +23,6 @@ export default function ResultPage() {
             }
         } catch (error) {
             console.log('error: ', error);
-
         }
 
     }

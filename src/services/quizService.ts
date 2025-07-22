@@ -1,5 +1,5 @@
 import { apiClient } from "@/hooks/baseApi";
-import { Quiz, QuizLog, QuizRequest, QuizResult } from "@/types";
+import { Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
 
 export const QuizService = {
     getQuizList: async (uuid: string) => {
@@ -22,8 +22,16 @@ export const QuizService = {
         const response = await apiClient.get<QuizResult>(`question/quiz/${logUuid}/result/`);
         return response.data;
     },
-    getQuizLogList: async (): Promise<QuizLog[]> => {
-        const response = await apiClient.get<QuizLog[]>(`question/logs`);
+    getQuizLogList: async (): Promise<QuizResult[]> => {
+        const response = await apiClient.get<QuizResult[]>(`question/logs`);
+        return response.data;
+    },
+    getQuizLogs: async (logUuid: string): Promise<Quiz[]> => {
+        const response = await apiClient.get<Quiz[]>(`question/logs/${logUuid}`);
+        return response.data;
+    },
+    getQuizTimer: async (logUuid: string): Promise<QuizTimer> => {
+        const response = await apiClient.get<QuizTimer>(`question/quiz/${logUuid}/timer`);
         return response.data;
     }
 };

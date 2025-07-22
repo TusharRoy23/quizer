@@ -6,37 +6,63 @@ import Question from "@/components/quiz/question";
 import Button from "@/components/ui/button/Button";
 import { CheckLine, ChevronLeft, ChevronRight } from "@/icons";
 import Timer from "@/components/quiz/timer";
-import { useSelector } from "react-redux";
-import { persistor, RootState } from "@/store";
+import { persistor } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
 import { useParams, useRouter } from "next/navigation";
 
 export default function QuizPage() {
-    const router = useParams();
-    const redirect = useRouter();
-    const uuid = router?.uuid;
-    const selector = useSelector((state: RootState) => state.steps.form);
+    const params = useParams();
+    const router = useRouter();
+    const uuid = params?.uuid;
 
     const [quiz, setQuiz] = useState<Quiz>();
     const [quizList, setQuizList] = useState<Quiz[]>([]);
     const [pageNumber, setPageNumber] = useState(0);
     const [IsLoading, setIsLoading] = useState(false);
+    const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
 
 
     const getAllQuizzes = async () => {
         if (typeof uuid !== "string") {
             throw new Error("Invalid UUID");
         }
-        const response = await QuizService.getQuizList(uuid);
+        try {
+            await ClientDBService.clearAllQuizzes();
+            const response = await QuizService.getQuizList(uuid);
 
-        if (response.length > 0) {
-            await ClientDBService.saveAllQuizzes(response);
+            if (response.length > 0) {
+                await ClientDBService.saveAllQuizzes(response);
+            }
+            setQuizList(response);
+            if (response.length > 0) {
+                setQuiz(response[0]);
+            }
+            persistor.purge();
+            getQuizTimer();
+        } catch (error) {
+            setQuizList([]);
+            setQuiz(undefined);
+            if (typeof error === "object" && error !== null && "status" in error && (error as any).status === 404) {
+                router.push('/');
+            }
         }
-        setQuizList(response);
-        if (response.length > 0) {
-            setQuiz(response[0]);
+    }
+    const getQuizTimer = async () => {
+        if (typeof uuid !== "string") {
+            throw new Error("Invalid UUID");
         }
-        persistor.purge();
+        try {
+            const { remainingSeconds } = await QuizService.getQuizTimer(uuid);
+
+            // Store for page reloads
+            setRemainingSeconds(remainingSeconds);
+
+            if (remainingSeconds < 0) {
+                onSubmit();
+            }
+        } catch (error) {
+            console.error("Error fetching quiz timer:", error);
+        }
     }
 
     const paginate = async (pageNum: number) => {
@@ -49,14 +75,15 @@ export default function QuizPage() {
             const response = await QuizService.submitQuiz(uuid as string);
             if (response) {
                 persistor.purge();
-                ClientDBService.clearAllQuizzes();
+                await ClientDBService.clearAllQuizzes();
                 window.location.href = `/result/${uuid}`;
-                // redirect.push(`/result/${uuid}`);
             }
         } catch (error) {
             setIsLoading(false);
         } finally {
             setIsLoading(false);
+            await ClientDBService.clearAllQuizzes();
+            window.location.href = `/result/${uuid}`;
         }
     }
 
@@ -99,12 +126,12 @@ export default function QuizPage() {
     return (
         <>
             {
-                quizList.length > 0 &&
+                quizList.length > 0 && remainingSeconds >= 0 &&
                 <div className="flex justify-center mb-4">
-                    <Timer duration={selector.timer * 60} onTimeUp={onSubmit} />
+                    <Timer duration={remainingSeconds} onTimeUp={onSubmit} />
                 </div>
             }
-            {quiz && <Question quiz={quiz} onSelect={onSelectAnswer} />}
+            {quiz && <Question quiz={quiz} onSelect={onSelectAnswer} canSelect={true} />}
             {quiz &&
                 <div className="flex justify-center mt-4">
                     <Button

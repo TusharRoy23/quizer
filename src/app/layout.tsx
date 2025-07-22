@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import GridShape from "@/components/layouts/GridShape";
+import Header from "@/components/common/Header";
+import React from "react";
 import Providers from "@/store/Providers";
 
 export const metadata: Metadata = {
@@ -17,9 +19,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <div className="relative flex flex-col items-center justify-center min-h-screen p-6 overflow-hidden z-1">
-            <GridShape />
-            {children}
+          <Header />
+          <div className="relative min-h-screen">
+            <GridShape className="absolute inset-0 w-full h-full -z-10" />
+            <div className="flex flex-col items-center justify-center min-h-screen p-6">
+              {children}
+            </div>
           </div>
         </Providers>
       </body>

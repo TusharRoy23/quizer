@@ -1,3 +1,8 @@
+export interface Authentication {
+    authenticated: boolean;
+    expiredAt: number;
+    user: UserInfo
+}
 export interface StepProps {
     onNextStep?: () => void,
     onPreviousStep?: () => void,
@@ -29,15 +34,18 @@ export interface Topic {
 export interface Quiz {
     uuid: string;
     question: string;
-    answer?: string;
+    answer?: number[];
     selected_index?: number | number[];
+    selected_answer?: number[];
     options: string[];
     question_type: "CHOICE" | "MULTIPLE_CHOICE";
+    explanation?: string;
 }
 
 export interface UserInfo {
     name: string;
     email: string;
+    uuid?: string;
 }
 
 export interface QuizRequest {
@@ -54,19 +62,15 @@ export interface QuizResult {
     timer: number;
     difficulty: string;
     question_count: number;
+    completed: boolean;
     score: boolean;
     total_answers: number;
     total_correct: number;
 }
 
-export interface QuizLog {
-    uuid: string;
-    department: Department;
-    timer: number;
-    difficulty: string;
-    question_count: number;
-    completed: boolean;
-    score: boolean;
-    total_answers: number;
-    total_correct: number;
+export interface QuizTimer {
+    remainingSeconds: number;
+    expiresAt: string;
+    timezoneOffset: number;
+    timezoneName: string;
 }

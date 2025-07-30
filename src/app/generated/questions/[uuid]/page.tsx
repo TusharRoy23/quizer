@@ -5,46 +5,26 @@ import { ChevronLeft, ChevronRight } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { Quiz } from "@/types";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const QuestionsPage = () => {
     const params = useParams();
     const router = useRouter();
     const uuid = params?.uuid as string || "";
-    const [quizList, setQuizList] = useState<Quiz[]>([]);
-    const [quiz, setQuiz] = useState<Quiz>();
     const [pageNumber, setPageNumber] = useState(0);
 
-    const getAllQuestions = async () => {
-        try {
-            const list = await QuizService.getQuizLogs(uuid);
-            if (list && list.length > 0) {
-                setQuizList(list);
-                setQuiz(list[0]);
-            }
-        } catch (error) {
-            console.log('error: ', error);
-        }
-    }
+    const { data: quizList = [], isLoading, error } = useQuery<Quiz[]>({
+        queryKey: ["quizLogs", uuid],
+        queryFn: () => QuizService.getQuizLogs(uuid),
+        enabled: !!uuid,
+    });
 
-    useEffect(() => {
-        if (uuid) {
-            getAllQuestions();
-        }
-    }, [uuid]);
+    const quiz = quizList[pageNumber];
 
-    useEffect(() => {
-        const quiz = quizList[pageNumber];
-        const updateQuiz = async () => {
-            if (!quiz) return;
-            setQuiz(quiz);
-        }
-        updateQuiz();
-    }, [pageNumber])
-
-    const paginate = async (pageNum: number) => {
+    const paginate = (pageNum: number) => {
         setPageNumber((prev) => prev + pageNum);
-    }
+    };
 
     return (
         <>

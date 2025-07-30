@@ -4,34 +4,19 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { CheckCircle } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { QuizResult } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function ResultPage() {
     const router = useRouter();
     const params = useParams();
     const uuid = params?.uuid as string || "";
-    const [result, setResult] = useState<QuizResult>();
 
-    const getQuizResult = async (uuid: string) => {
-        try {
-            const result = await QuizService.getQuizResult(uuid as string);
-            if (result) {
-                setResult(result);
-            } else {
-                console.error("Failed to fetch quiz result");
-            }
-        } catch (error) {
-            console.log('error: ', error);
-        }
-
-    }
-
-    useEffect(() => {
-        if (uuid) {
-            getQuizResult(uuid);
-        }
-    }, [uuid]);
+    const { data: result } = useQuery<QuizResult>({
+        queryKey: ["quizResult", uuid],
+        queryFn: () => QuizService.getQuizResult(uuid),
+        enabled: !!uuid,
+    });
     return (
         <>
             <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">

@@ -4,27 +4,23 @@ import { ArrowRight } from "@/icons";
 import SelectInput from "../form/SelectInput";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { selectDepartment, selectTopics, setDepartmentList, setTopicList } from "@/store/reducers/stepSlice";
-import { useEffect } from "react";
+import { selectDepartment, selectTopics } from "@/store/reducers/stepSlice";
 import { fetchDepartments } from "@/services/departmentService";
+import { useQuery } from "@tanstack/react-query";
 
 export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
-    const departmentList: Department[] = useSelector((state: RootState) => state.steps.departmentList) || [];
 
-    useEffect(() => {
-        const loadDepartments = async () => {
-            const departments: Department[] = await fetchDepartments();
-            dispatch(setDepartmentList(departments));
-        };
-        loadDepartments();
-    }, [dispatch]);
+    const { data: departmentList = [], isLoading, isError } = useQuery<Department[]>({
+        queryKey: ["departments"],
+        queryFn: fetchDepartments,
+    });
+
     const department = useSelector((state: RootState) => state.steps.form.department);
 
     const onSelectDept = (dept: Department) => {
         dispatch(selectDepartment(dept));
         dispatch(selectTopics([]));
-        dispatch(setTopicList([]));
     }
 
     return (

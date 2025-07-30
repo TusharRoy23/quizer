@@ -1,33 +1,27 @@
 import { StepProps, Topic } from "@/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
-import { useEffect, useState } from "react";
 import { fetchTopics } from "@/services/topicService";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import MultiSelect from "../form/MultiSelectInput";
 import { selectTopics } from "@/store/reducers/stepSlice";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
-    const [topics, setTopics] = useState<Topic[]>([]);
     const selectedTopics = useSelector((state: RootState) => state.steps.form.topics) || [];
-    const cachedTopics = useSelector((state: RootState) => state.steps.topicList) || [];
     const selectedDepartment = useSelector((state: RootState) => state.steps.form.department);
 
-    useEffect(() => {
-        if (selectedDepartment) {
-            if (!cachedTopics.length) {
-                const loadTopics = async () => {
-                    const topics = await fetchTopics(selectedDepartment);
-                    setTopics(topics);
-                }
-                loadTopics();
-            } else {
-                setTopics(cachedTopics);
+    const { data: topics = [], isLoading, isError } = useQuery<Topic[]>({
+        queryKey: ["topics", selectedDepartment],
+        queryFn: async () => {
+            if (selectedDepartment) {
+                return await fetchTopics(selectedDepartment);
             }
-        }
-    }, []);
+            return [];
+        },
+    });
 
     const onSelectTopics = (topics: Topic[]) => {
         dispatch(selectTopics(topics));

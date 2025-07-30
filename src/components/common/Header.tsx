@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { setAuthentication } from "@/store/reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Header() {
     const router = useRouter();
@@ -30,20 +31,27 @@ export default function Header() {
         }
     }
 
+    const { data: authData, refetch: checkAuth } = useQuery({
+        queryKey: ['authStatus'],
+        queryFn: AuthService.checkAuthentication,
+        refetchOnWindowFocus: false,
+        retry: false,
+        enabled: !isAuthenticated,
+    });
+
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await AuthService.checkAuthentication();
-                if (res?.authenticated) {
-                    dispatch(setAuthentication(res));
-                    localStorage.setItem("accessTokenExpiry", res.expiredAt.toString());
-                }
-            } catch (err) {
-                console.log("Not authenticated");
-            }
-        };
-        checkAuth();
-    }, []);
+        if (!isAuthenticated) {
+            checkAuth();
+        }
+    }, [isAuthenticated, checkAuth]);
+
+    // Update Redux store if authData changes
+    useEffect(() => {
+        if (authData?.authenticated) {
+            dispatch(setAuthentication(authData));
+            localStorage.setItem("accessTokenExpiry", authData.expiredAt.toString());
+        }
+    }, [authData, dispatch]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

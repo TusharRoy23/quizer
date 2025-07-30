@@ -4,23 +4,22 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ArrowRight } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { QuizResult } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function GeneratedPage() {
-    const [logs, setLogs] = useState<QuizResult[]>([]);
     const router = useRouter();
-    const getQuizLogList = async () => {
+    const { data: logs = [], isLoading, isError } = useQuery<QuizResult[]>({
+        queryKey: ["quizLogs"],
+        queryFn: QuizService.getQuizLogList,
+    });
+    const handleNavigation = async (uuid: string) => {
         try {
-            const logs = await QuizService.getQuizLogList();
-            setLogs(logs);
+            router.push(`/generated/questions/${uuid}`);
         } catch (error) {
-
+            console.error('Navigation error:', error);
         }
-    }
-    useEffect(() => {
-        getQuizLogList();
-    }, []);
+    };
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
             <div className="w-full max-w-[630px] text-center">
@@ -102,9 +101,7 @@ export default function GeneratedPage() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                        <Button size="sm" variant="outline" endIcon={<ArrowRight />} onClick={() => {
-                                            router.push(`/generated/questions/${log.uuid}`);
-                                        }}>
+                                        <Button size="sm" variant="outline" endIcon={<ArrowRight />} onClick={() => handleNavigation(log.uuid)}>
                                             Revision
                                         </Button>
                                     </TableCell>

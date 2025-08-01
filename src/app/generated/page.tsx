@@ -34,6 +34,11 @@ export default function GeneratedPage() {
                             <TableRow>
                                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                        Date
+                                    </div>
+                                </TableCell>
+                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Difficulty
                                     </div>
                                 </TableCell>
@@ -70,6 +75,11 @@ export default function GeneratedPage() {
                             </TableRow>
                             {logs.map((log) => (
                                 <TableRow key={log.uuid}>
+                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            {log.created_at ? new Date(log.created_at).toUTCString() : '-'}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.difficulty}

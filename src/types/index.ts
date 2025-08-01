@@ -66,6 +66,7 @@ export interface QuizResult {
     score: boolean;
     total_answers: number;
     total_correct: number;
+    created_at: string;
 }
 
 export interface QuizTimer {

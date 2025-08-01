@@ -38,7 +38,7 @@ export default function QuizPage() {
     });
 
     // Fetch quiz list
-    const { data: quizList = [] } = useQuery<Quiz[]>({
+    const { data: quizList = [], isError: inQuizListError } = useQuery<Quiz[]>({
         queryKey: ['quizzes', uuid],
         queryFn: async () => {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
@@ -80,11 +80,47 @@ export default function QuizPage() {
                 uuid: updatedQuiz.uuid,
                 answers: Array.isArray(selectedIdx) ? [...selectedIdx] : [selectedIdx]
             });
+        },
+        onMutate: async (selectedIdx) => {
+            // 1. Cancel any ongoing queries for the current quiz
+            await queryClient.cancelQueries({
+                queryKey: ['currentQuiz', quizList?.[pageNumber]?.uuid]
+            });
+
+            // 2. Get the current quiz data snapshot
+            const previousQuiz = queryClient.getQueryData<Quiz>(['currentQuiz', quizList?.[pageNumber]?.uuid]);
+
+            // 3. Optimistically update to the new value
+            queryClient.setQueryData(['currentQuiz', quizList?.[pageNumber]?.uuid], (old: Quiz | undefined) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    selected_index: selectedIdx
+                };
+            });
+
+            // 4. Return the context with previous value for potential rollback
+            return { previousQuiz };
+        },
+        onError: (err, variables, context) => {
+            // 5. Roll back to previous value if error occurs
+            if (context?.previousQuiz) {
+                queryClient.setQueryData(
+                    ['currentQuiz', quizList?.[pageNumber]?.uuid],
+                    context.previousQuiz
+                );
+            }
+        },
+        onSettled: () => {
+            // 6. Invalidate query to ensure server-state sync
+            queryClient.invalidateQueries({
+                queryKey: ['currentQuiz', quizList?.[pageNumber]?.uuid]
+            });
         }
     });
 
     // Fetch timer
-    const { data: timer, isError } = useQuery<QuizTimer>({
+    const { data: timer, isError: isTimerError } = useQuery<QuizTimer>({
         queryKey: ['quizTimer', uuid],
         queryFn: async () => {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
@@ -93,15 +129,9 @@ export default function QuizPage() {
         refetchInterval: 30000, // Refetch every 30 seconds
     });
 
-    if (isError) {
+    if (isTimerError || inQuizListError) {
         router.push(`/result/${uuid}`);
     }
-
-    useEffect(() => {
-        if (timer && timer?.remainingSeconds <= 0) {
-            submitQuiz.mutate();
-        }
-    }, [timer, submitQuiz]);
 
     const paginate = async (pageNum: number) => {
         setPageNumber((prev) => prev + pageNum);

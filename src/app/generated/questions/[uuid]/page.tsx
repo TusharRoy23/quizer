@@ -5,25 +5,28 @@ import { ChevronLeft, ChevronRight } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { Quiz } from "@/types";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setGeneratedPageNumber } from "@/store/reducers/quizSlice";
 
 const QuestionsPage = () => {
     const params = useParams();
     const router = useRouter();
     const uuid = params?.uuid as string || "";
-    const [pageNumber, setPageNumber] = useState(0);
 
     const { data: quizList = [], isLoading, error } = useQuery<Quiz[]>({
         queryKey: ["quizLogs", uuid],
         queryFn: () => QuizService.getQuizLogs(uuid),
         enabled: !!uuid,
     });
+    const pageNumber = useSelector((state: RootState) => state.quiz.generatedPageNumber);
+    const dispatch = useDispatch();
 
     const quiz = quizList[pageNumber];
 
     const paginate = (pageNum: number) => {
-        setPageNumber((prev) => prev + pageNum);
+        dispatch(setGeneratedPageNumber({ pageNumber: pageNumber + pageNum }));
     };
 
     return (

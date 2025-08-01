@@ -1,22 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
 import { QuizService } from "../../../services/quizService";
 import { Quiz, QuizTimer } from "@/types";
 import Question from "@/components/quiz/question";
 import Button from "@/components/ui/button/Button";
 import { CheckLine, ChevronLeft, ChevronRight } from "@/icons";
 import Timer from "@/components/quiz/timer";
-import { persistor } from "@/store";
+import { persistor, RootState } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
 import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+import { setPageNumber } from "@/store/reducers/quizSlice";
+import { useEffect } from "react";
 
 export default function QuizPage() {
     const params = useParams();
     const router = useRouter();
     const uuid = params?.uuid;
     const queryClient = useQueryClient();
-    const [pageNumber, setPageNumber] = useState(0);
+    const pageNumber = useSelector((state: RootState) => state.quiz.pageNumber);
+    const dispatch = useDispatch();
 
     const submitQuiz = useMutation({
         mutationFn: async () => {
@@ -134,7 +137,7 @@ export default function QuizPage() {
     }
 
     const paginate = async (pageNum: number) => {
-        setPageNumber((prev) => prev + pageNum);
+        dispatch(setPageNumber({ pageNumber: pageNumber + pageNum }));
     }
 
     const onSelectAnswer = async (selectedIdx: number | number[]) => {
@@ -146,6 +149,12 @@ export default function QuizPage() {
             }
         });
     }
+    // Reset page number on component unmount
+    useEffect(() => {
+        return () => {
+            dispatch(setPageNumber({ pageNumber: 0 }));
+        };
+    }, [dispatch]);
 
     return (
         <>

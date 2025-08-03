@@ -74,8 +74,22 @@ apiClient.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        if (error.status === 401) {
-            clearLocalStorageAndDB();
+        if (error.response) {
+            // Handle structured error responses
+            const serverError = error.response.data;
+
+            if (error.response.status === 401) {
+                clearLocalStorageAndDB();
+            }
+
+            // Create a new error with the server message
+            const errorWithMessage = new Error(
+                serverError.message ||
+                serverError.data?.message ||
+                'An error occurred'
+            );
+
+            return Promise.reject(errorWithMessage);
         }
         return Promise.reject(error);
     }

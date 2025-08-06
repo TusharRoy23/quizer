@@ -75,3 +75,24 @@ export interface QuizTimer {
     timezoneOffset: number;
     timezoneName: string;
 }
+
+export interface PaginationMetadata {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    limit: number;
+    page: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: PaginationMetadata;
+}
+
+export interface CustomResponse<T> {
+    data: T[];
+    meta: PaginationMetadata;
+    status?: number;
+    message?: string;
+}

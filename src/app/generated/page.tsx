@@ -1,21 +1,51 @@
 "use client";
+import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { ArrowRight } from "@/icons";
+import { ArrowRight, Grid } from "@/icons";
 import { QuizService } from "@/services/quizService";
-import { QuizResult } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { PaginatedResponse, QuizResult } from "@/types";
+import { QueryFunctionContext, useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+
+const LIMIT = 10;
 
 export default function GeneratedPage() {
     const router = useRouter();
-    const { data: logs = [], isLoading, isError } = useQuery<QuizResult[]>({
+    const {
+        data,
+        isError,
+        isFetchingNextPage,
+        fetchNextPage,
+        hasNextPage,
+        error,
+        isLoading,
+    } = useInfiniteQuery<PaginatedResponse<QuizResult>>({
         queryKey: ["quizLogs"],
-        queryFn: QuizService.getQuizLogList,
+        initialPageParam: 1,
+        queryFn: async ({ pageParam = 1 }: QueryFunctionContext) => {
+            const page = (pageParam as number) || 1;
+            return QuizService.getQuizLogList({ page, limit: LIMIT });
+        },
+        getNextPageParam: (lastPage) => {
+            if (lastPage.meta.hasNextPage) {
+                return lastPage.meta.page + 1;
+            }
+            return undefined;
+        },
     });
+    const allLogs = data?.pages.flatMap(page => page.data) || [];
+
+    if (isError) {
+        return <ErrorDisplay
+            title="Error"
+            message={error?.message}
+            onReturn={() => router.push("/")}
+        />
+    }
     const handleNavigation = async (uuid: string) => {
         try {
-            router.push(`/generated/questions/${uuid}`);
+            router.push(`/generated/questions/${uuid}?page=1`);
         } catch (error) {
             console.error('Navigation error:', error);
         }
@@ -73,7 +103,7 @@ export default function GeneratedPage() {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                            {logs.map((log) => (
+                            {allLogs?.map((log) => (
                                 <TableRow key={log.uuid}>
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -117,6 +147,22 @@ export default function GeneratedPage() {
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            <TableRow>
+                                <TableCell colSpan={8} className="text-center py-4">
+                                    {isFetchingNextPage ? (
+                                        <span>Loading...</span>
+                                    ) : hasNextPage ? (
+                                        <Button
+                                            startIcon={<Grid />}
+                                            onClick={() => fetchNextPage()}
+                                            variant="outline"
+                                            size="sm"
+                                        >
+                                            Load More
+                                        </Button>
+                                    ) : null}
+                                </TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </div>

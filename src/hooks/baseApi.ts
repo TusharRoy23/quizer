@@ -71,7 +71,13 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
     (response) => {
-        return response.data;
+        return {
+            ...response,
+            data: response.data.data,
+            meta: response.data?.meta || {},
+            status: response.data?.status,
+            message: response.data?.message
+        }
     },
     (error) => {
         if (error.response) {
@@ -84,9 +90,9 @@ apiClient.interceptors.response.use(
 
             // Create a new error with the server message
             const errorWithMessage = new Error(
-                serverError.message ||
-                serverError.data?.message ||
-                'An error occurred'
+                serverError?.message ||
+                serverError?.data?.message ||
+                serverError || 'An error occurred'
             );
 
             return Promise.reject(errorWithMessage);

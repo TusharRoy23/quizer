@@ -13,7 +13,7 @@ const persistedAuthReducer = persistReducer(persistConfigAuth, authSlice);
 
 const rootReducer = combineReducers({
     steps: persistedStepReducer,
-    auth: persistedAuthReducer
+    auth: persistedAuthReducer,
 });
 
 export const store = configureStore({

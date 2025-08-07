@@ -1,4 +1,5 @@
 "use client";
+import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { CheckCircle } from "@/icons";
@@ -12,14 +13,23 @@ export default function ResultPage() {
     const params = useParams();
     const uuid = params?.uuid as string || "";
 
-    const { data: result } = useQuery<QuizResult>({
+    const { data: result, isError: isError, error } = useQuery<QuizResult>({
         queryKey: ["quizResult", uuid],
         queryFn: () => QuizService.getQuizResult(uuid),
         enabled: !!uuid,
+        retry: false
     });
+    if (isError) {
+        return <ErrorDisplay
+            title="Quiz Results Unavailable"
+            message={error?.message}
+            onReturn={() => router.push("/")}
+        />
+    }
+
     return (
         <>
-            <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+            {result && <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
                 <div className="w-full max-w-[630px] text-center">
                     <h3 className="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
                         Your Score 🎉
@@ -112,7 +122,7 @@ export default function ResultPage() {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div>}
         </>
     );
 }

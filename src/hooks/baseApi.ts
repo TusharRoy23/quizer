@@ -71,11 +71,31 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
     (response) => {
-        return response.data;
+        return {
+            ...response,
+            data: response.data.data,
+            meta: response.data?.meta || {},
+            status: response.data?.status,
+            message: response.data?.message
+        }
     },
     (error) => {
-        if (error.status === 401) {
-            clearLocalStorageAndDB();
+        if (error.response) {
+            // Handle structured error responses
+            const serverError = error.response.data;
+
+            if (error.response.status === 401) {
+                clearLocalStorageAndDB();
+            }
+
+            // Create a new error with the server message
+            const errorWithMessage = new Error(
+                serverError?.message ||
+                serverError?.data?.message ||
+                serverError || 'An error occurred'
+            );
+
+            return Promise.reject(errorWithMessage);
         }
         return Promise.reject(error);
     }

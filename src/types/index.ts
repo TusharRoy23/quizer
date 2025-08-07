@@ -66,6 +66,7 @@ export interface QuizResult {
     score: boolean;
     total_answers: number;
     total_correct: number;
+    created_at: string;
 }
 
 export interface QuizTimer {
@@ -73,4 +74,25 @@ export interface QuizTimer {
     expiresAt: string;
     timezoneOffset: number;
     timezoneName: string;
+}
+
+export interface PaginationMetadata {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    limit: number;
+    page: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta: PaginationMetadata;
+}
+
+export interface CustomResponse<T> {
+    data: T[];
+    meta: PaginationMetadata;
+    status?: number;
+    message?: string;
 }

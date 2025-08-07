@@ -1,5 +1,6 @@
 import { apiClient } from "@/hooks/baseApi";
-import { Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
+import { PaginatedResponse, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
+import { CommonService } from "./commonService"
 
 export const QuizService = {
     getQuizList: async (uuid: string) => {
@@ -22,9 +23,9 @@ export const QuizService = {
         const response = await apiClient.get<QuizResult>(`question/quiz/${logUuid}/result/`);
         return response.data;
     },
-    getQuizLogList: async (): Promise<QuizResult[]> => {
-        const response = await apiClient.get<QuizResult[]>(`question/logs`);
-        return response.data;
+
+    getQuizLogList: async ({ page, limit }: { page: number, limit: number } = { page: 1, limit: 10 }): Promise<PaginatedResponse<QuizResult>> => {
+        return CommonService.createPaginationFetcher<QuizResult>()('question/logs', page, limit);
     },
     getQuizLogs: async (logUuid: string): Promise<Quiz[]> => {
         const response = await apiClient.get<Quiz[]>(`question/logs/${logUuid}`);

@@ -9,6 +9,7 @@ import CheckLine from "./check-line.svg";
 import File from "./file.svg";
 import Folder from "./folder.svg";
 import Grid from "./grid.svg";
+import Alert from "./alert.svg";
 
 export {
     PaperPlaneIcon,
@@ -21,5 +22,6 @@ export {
     CheckLine,
     File,
     Folder,
-    Grid
+    Grid,
+    Alert
 }

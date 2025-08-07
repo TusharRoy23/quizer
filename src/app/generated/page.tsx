@@ -2,6 +2,7 @@
 import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { TableRowSkeleton } from "@/components/ui/table/TableRowSkeleton";
 import { ArrowRight, Grid } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { PaginatedResponse, QuizResult } from "@/types";
@@ -43,6 +44,7 @@ export default function GeneratedPage() {
             onReturn={() => router.push("/")}
         />
     }
+
     const handleNavigation = async (uuid: string) => {
         try {
             router.push(`/generated/questions/${uuid}?page=1`);
@@ -50,6 +52,7 @@ export default function GeneratedPage() {
             console.error('Navigation error:', error);
         }
     };
+
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
             <div className="w-full max-w-[630px] text-center">
@@ -103,8 +106,19 @@ export default function GeneratedPage() {
                                     </div>
                                 </TableCell>
                             </TableRow>
+
+                            {/* Loading State */}
+                            {isLoading && allLogs.length === 0 && (
+                                <>
+                                    {Array(5).fill(0).map((_, i) => (
+                                        <TableRowSkeleton arrLen={8} key={`skeleton-${i}`} />
+                                    ))}
+                                </>
+                            )}
+
+                            {/* Data Rows */}
                             {allLogs?.map((log) => (
-                                <TableRow key={log.uuid}>
+                                <TableRow key={log.uuid} className="fade-in">
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.created_at ? new Date(log.created_at).toUTCString() : '-'}
@@ -147,10 +161,14 @@ export default function GeneratedPage() {
                                     </TableCell>
                                 </TableRow>
                             ))}
+
+                            {/* Load More */}
                             <TableRow>
                                 <TableCell colSpan={8} className="text-center py-4">
                                     {isFetchingNextPage ? (
-                                        <span>Loading...</span>
+                                        <div className="flex justify-center">
+                                            <div className="h-8 w-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                                        </div>
                                     ) : hasNextPage ? (
                                         <Button
                                             startIcon={<Grid />}
@@ -167,6 +185,6 @@ export default function GeneratedPage() {
                     </Table>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }

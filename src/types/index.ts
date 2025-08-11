@@ -96,3 +96,10 @@ export interface CustomResponse<T> {
     status?: number;
     message?: string;
 }
+
+export interface QuestionKeyword {
+    uuid: string;
+    keyword: string;
+    explanation?: string;
+    example?: string;
+}

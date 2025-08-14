@@ -28,14 +28,12 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                     label={option}
                                 />
                             ) : (
-                                <>
-                                    <p key={index}>
-                                        <span className="font-semibold">{index + 1}.</span> {option}.
-                                        {quiz.answer?.join(',') === index.toString() && <span className="text-green-500"> (Correct)</span>}
-                                        {quiz.selected_answer?.join(',') === index.toString() && quiz.selected_answer?.join(',') !== quiz.answer?.join(',')
-                                            && <span className="text-red-500"> (Incorrect)</span>}
-                                    </p>
-                                </>
+                                <p key={index}>
+                                    <span className="font-semibold">{index + 1}.</span> {option}.
+                                    {quiz.answer?.join(',') === index.toString() && <span className="text-green-500"> (Correct)</span>}
+                                    {quiz.selected_answer?.join(',') === index.toString() && quiz.selected_answer?.join(',') !== quiz.answer?.join(',')
+                                        && <span className="text-red-500"> (Incorrect)</span>}
+                                </p>
                             )
                         } else if (quiz.question_type === "MULTIPLE_CHOICE") {
                             return canSelect ? (
@@ -57,14 +55,13 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                     }}
                                     className="w-full"
                                 />
-                            ) : <>
-                                <p key={index}>
+                            ) :
+                                (<p key={index}>
                                     <span className="font-semibold">{index + 1}.</span> {option}
                                     {quiz.answer?.includes(index) && <span className="text-green-500"> (Correct)</span>}
                                     {quiz.selected_answer?.includes(index) && quiz.selected_answer?.join(',') !== quiz.answer?.join(',')
                                         && <span className="text-red-500"> (Incorrect)</span>}
-                                </p>
-                            </>;
+                                </p>);
                         }
                     })}
                     {quiz.explanation && (

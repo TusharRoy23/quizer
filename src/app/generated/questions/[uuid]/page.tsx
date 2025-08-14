@@ -7,6 +7,8 @@ import { Quiz } from "@/types";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import KeywordPage from "@/components/quiz/keyword";
+import ErrorDisplay from "@/components/error/errorDisplay";
 
 const QuestionsPage = () => {
     const params = useParams();
@@ -18,71 +20,85 @@ const QuestionsPage = () => {
     const pageParam = searchParams.get("page");
     const currentPage = pageParam ? Math.max(1, parseInt(pageParam)) : 1;
 
-    const { data: quizList = [], isLoading, error } = useQuery<Quiz[]>({
+    const { data: quizList = [], isLoading, error, isError } = useQuery<Quiz[]>({
         queryKey: ["quizLogs", uuid],
         queryFn: () => QuizService.getQuizLogs(uuid),
         enabled: !!uuid,
+        retry: 1,
     });
 
     const quiz = quizList[currentPage - 1];
 
     const handlePageChange = (newPage: number) => {
-        // Ensure page stays within bounds
-        const validatedPage = Math.max(0, Math.min(newPage, quizList.length));
+        const validatedPage = Math.max(1, Math.min(newPage, quizList.length));
         router.push(`?page=${validatedPage}`);
     };
 
-    // Validate page number on load
     useEffect(() => {
-        if (quizList.length > 0 && currentPage >= quizList.length) {
-            // If page is out of bounds, redirect to last page
+        if (quizList.length > 0 && currentPage > quizList.length) {
             handlePageChange(quizList.length);
         }
     }, [quizList.length, currentPage]);
 
+    if (isError) {
+        return <ErrorDisplay
+            title="Error"
+            message={error?.message}
+            onReturn={() => router.push("/")}
+        />
+    }
+
     return (
-        <>
-            {isLoading && <div className="text-center">Loading...</div>}
-            {error && <div className="text-center text-red-500">Error loading questions</div>}
+        <div className="max-w-4xl mx-auto px-4 py-6">
+            {isLoading && <div className="text-center py-8">Loading questions...</div>}
 
-            {quiz && <Question quiz={quiz} onSelect={() => { }} canSelect={false} />}
-
-            {quizList.length > 0 && (
+            {quiz && (
                 <>
-                    <div className="flex justify-center mt-4">
-                        <Button
-                            className="mr-2"
-                            size="sm"
-                            variant="outline"
-                            startIcon={<ChevronLeft />}
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            endIcon={<ChevronRight />}
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === quizList.length}
-                        >
-                            Next
-                        </Button>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                        <Question quiz={quiz} onSelect={() => { }} canSelect={false} />
+
+                        <div className="mt-6">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                                Related Keywords
+                            </h3>
+                            <KeywordPage questionUuid={quiz.uuid} />
+                        </div>
                     </div>
 
-                    <div className="flex justify-center mt-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+                        <div className="flex items-center gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                startIcon={<ChevronLeft />}
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                endIcon={<ChevronRight />}
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === quizList.length}
+                            >
+                                Next
+                            </Button>
+                        </div>
+
                         <Button
                             size="sm"
                             variant="outline"
                             onClick={() => router.push('/generated')}
+                            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Back to list
                         </Button>
                     </div>
                 </>
             )}
-        </>
+        </div>
     );
 };
 

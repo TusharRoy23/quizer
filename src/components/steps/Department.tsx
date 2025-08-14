@@ -14,6 +14,7 @@ export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep 
     const { data: departmentList = [], isLoading, isError } = useQuery<Department[]>({
         queryKey: ["departments"],
         queryFn: fetchDepartments,
+        retry: 1,
     });
 
     const department = useSelector((state: RootState) => state.steps.form.department);

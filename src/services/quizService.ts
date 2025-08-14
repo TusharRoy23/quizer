@@ -1,5 +1,5 @@
 import { apiClient } from "@/hooks/baseApi";
-import { PaginatedResponse, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
+import { PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
 import { CommonService } from "./commonService"
 
 export const QuizService = {
@@ -34,5 +34,17 @@ export const QuizService = {
     getQuizTimer: async (logUuid: string): Promise<QuizTimer> => {
         const response = await apiClient.get<QuizTimer>(`question/quiz/${logUuid}/timer`);
         return response.data;
-    }
+    },
+    getQuestionKeywordsByUuid: async (uuid: string): Promise<QuestionKeyword[]> => {
+        const response = await apiClient.get<QuestionKeyword[]>(`question/keywords/${uuid}/`);
+        return response.data;
+    },
+    getKeywordDetails: async (keywordUuid: string): Promise<QuestionKeyword> => {
+        const response = await apiClient.get<QuestionKeyword>(`question/keywords/details/${keywordUuid}/`);
+        return response.data;
+    },
+    getKeywordExample: async (keywordUuid: string): Promise<string> => {
+        const response = await apiClient.get<string>(`question/keywords/example/${keywordUuid}/`);
+        return response.data;
+    },
 };

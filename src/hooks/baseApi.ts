@@ -28,7 +28,6 @@ export const apiClient = axios.create({
 const clearLocalStorageAndDB = () => {
     localStorage.clear();
     ClientDBService.clearAllQuizzes();
-    window.location.href = '/';
 };
 
 let refreshPromise: Promise<void> | null = null;
@@ -44,6 +43,7 @@ const callRefreshToken = async () => {
             })
             .catch((err) => {
                 clearLocalStorageAndDB();
+                window.location.href = '/';
                 throw err;
             })
             .finally(() => {
@@ -64,6 +64,7 @@ apiClient.interceptors.request.use(
     (error) => {
         if (error.status === 401) {
             clearLocalStorageAndDB();
+            window.location.href = '/';
         }
         return Promise.reject(error);
     }
@@ -85,6 +86,12 @@ apiClient.interceptors.response.use(
             const serverError = error.response.data;
 
             if (error.response.status === 401) {
+                clearLocalStorageAndDB();
+                window.location.href = '/';
+            }
+
+            if (error.response.status === 409) {
+                // Handle forbidden access
                 clearLocalStorageAndDB();
             }
 

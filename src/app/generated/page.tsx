@@ -34,6 +34,7 @@ export default function GeneratedPage() {
             }
             return undefined;
         },
+        retry: 1, // Retry once on failure
     });
     const allLogs = data?.pages.flatMap(page => page.data) || [];
 

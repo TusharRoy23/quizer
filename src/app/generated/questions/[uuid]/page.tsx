@@ -8,6 +8,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import KeywordPage from "@/components/quiz/keyword";
+import ErrorDisplay from "@/components/error/errorDisplay";
 
 const QuestionsPage = () => {
     const params = useParams();
@@ -19,10 +20,11 @@ const QuestionsPage = () => {
     const pageParam = searchParams.get("page");
     const currentPage = pageParam ? Math.max(1, parseInt(pageParam)) : 1;
 
-    const { data: quizList = [], isLoading, error } = useQuery<Quiz[]>({
+    const { data: quizList = [], isLoading, error, isError } = useQuery<Quiz[]>({
         queryKey: ["quizLogs", uuid],
         queryFn: () => QuizService.getQuizLogs(uuid),
         enabled: !!uuid,
+        retry: 1,
     });
 
     const quiz = quizList[currentPage - 1];
@@ -38,14 +40,17 @@ const QuestionsPage = () => {
         }
     }, [quizList.length, currentPage]);
 
+    if (isError) {
+        return <ErrorDisplay
+            title="Error"
+            message={error?.message}
+            onReturn={() => router.push("/")}
+        />
+    }
+
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
             {isLoading && <div className="text-center py-8">Loading questions...</div>}
-            {error && (
-                <div className="text-center text-red-500 py-8">
-                    Error loading questions: {error.message}
-                </div>
-            )}
 
             {quiz && (
                 <>

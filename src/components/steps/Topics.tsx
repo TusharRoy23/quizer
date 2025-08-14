@@ -21,6 +21,7 @@ export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepP
             }
             return [];
         },
+        retry: 1,
     });
 
     const onSelectTopics = (topics: Topic[]) => {

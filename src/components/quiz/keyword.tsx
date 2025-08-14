@@ -10,6 +10,7 @@ const KeywordPage = ({ questionUuid }: { questionUuid: string }) => {
         queryKey: ["questionKeywords", questionUuid],
         queryFn: () => QuizService.getQuestionKeywordsByUuid(questionUuid),
         enabled: !!questionUuid,
+        retry: 1,
     });
     const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
 

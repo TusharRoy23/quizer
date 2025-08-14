@@ -55,7 +55,8 @@ export default function QuizPage() {
             }
             persistor.purge();
             return response;
-        }
+        },
+        retry: 1
     });
 
     // Get current quiz from local DB
@@ -133,6 +134,7 @@ export default function QuizPage() {
             return await QuizService.getQuizTimer(uuid);
         },
         refetchInterval: 30000, // Refetch every 30 seconds
+        retry: 1
     });
 
     if (isTimerError || inQuizListError) {
@@ -199,7 +201,7 @@ export default function QuizPage() {
                     </Button>
                 </div>
             }
-            {quizList.length > 0 &&
+            {quizList.length > 0 && quiz &&
                 <div className="flex justify-center mt-4">
                     <Button
                         className="mr-2"

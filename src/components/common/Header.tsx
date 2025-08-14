@@ -36,14 +36,11 @@ export default function Header() {
         queryFn: AuthService.checkAuthentication,
         refetchOnWindowFocus: false,
         retry: false,
-        enabled: !isAuthenticated,
     });
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            checkAuth();
-        }
-    }, [isAuthenticated, checkAuth]);
+        checkAuth();
+    }, []);
 
     // Update Redux store if authData changes
     useEffect(() => {

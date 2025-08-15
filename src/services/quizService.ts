@@ -47,4 +47,8 @@ export const QuizService = {
         const response = await apiClient.get<string>(`question/keywords/example/${keywordUuid}/`);
         return response.data;
     },
+    getLatestOnGoingQuiz: async (): Promise<QuizResult> => {
+        const response = await apiClient.get<QuizResult>(`question/ongoing/quiz/`);
+        return response.data;
+    }
 };

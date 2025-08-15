@@ -134,7 +134,8 @@ export default function QuizPage() {
             return await QuizService.getQuizTimer(uuid);
         },
         refetchInterval: 30000, // Refetch every 30 seconds
-        retry: 1
+        retry: 1,
+        staleTime: 0,
     });
 
     if (isTimerError || inQuizListError) {

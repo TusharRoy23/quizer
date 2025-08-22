@@ -9,7 +9,7 @@ import { persistor } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export default function QuizPage() {
     const params = useParams();
@@ -142,12 +142,17 @@ export default function QuizPage() {
         router.push(`/result/${uuid}`);
     }
 
+    const handlePageChange = useCallback((newDisplayPage: number) => {
+        const validatedPage = Math.max(1, Math.min(newDisplayPage, quizList.length));
+        router.push(`?page=${validatedPage}`);
+    }, [quizList.length, router]);
+
     // Validate page number on load and quizList changes
     useEffect(() => {
         if (quizList.length > 0 && displayPage > quizList.length) {
             handlePageChange(quizList.length);
         }
-    }, [quizList.length, displayPage]);
+    }, [quizList.length, displayPage, handlePageChange]);
 
     // Handle timer expiration and errors
     useEffect(() => {
@@ -157,7 +162,7 @@ export default function QuizPage() {
         if (timer?.remainingSeconds && timer?.remainingSeconds <= 0) {
             submitQuiz.mutate();
         }
-    }, [isTimerError, inQuizListError, timer]);
+    }, [isTimerError, inQuizListError, timer, router, uuid, submitQuiz]);
 
     const onSelectAnswer = async (selectedIdx: number | number[]) => {
         saveAnswer.mutate(selectedIdx, {
@@ -168,11 +173,6 @@ export default function QuizPage() {
             }
         });
     }
-
-    const handlePageChange = (newDisplayPage: number) => {
-        const validatedPage = Math.max(1, Math.min(newDisplayPage, quizList.length));
-        router.push(`?page=${validatedPage}`);
-    };
 
     return (
         <>

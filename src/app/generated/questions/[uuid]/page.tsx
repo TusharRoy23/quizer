@@ -6,7 +6,7 @@ import { QuizService } from "@/services/quizService";
 import { Quiz } from "@/types";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import KeywordPage from "@/components/quiz/keyword";
 import ErrorDisplay from "@/components/error/errorDisplay";
 
@@ -29,16 +29,16 @@ const QuestionsPage = () => {
 
     const quiz = quizList[currentPage - 1];
 
-    const handlePageChange = (newPage: number) => {
+    const handlePageChange = useCallback((newPage: number) => {
         const validatedPage = Math.max(1, Math.min(newPage, quizList.length));
         router.push(`?page=${validatedPage}`);
-    };
+    }, [quizList.length, router]);
 
     useEffect(() => {
         if (quizList.length > 0 && currentPage > quizList.length) {
             handlePageChange(quizList.length);
         }
-    }, [quizList.length, currentPage]);
+    }, [quizList.length, currentPage, handlePageChange]);
 
     if (isError) {
         return <ErrorDisplay

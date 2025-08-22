@@ -13,7 +13,7 @@ export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepP
     const selectedTopics = useSelector((state: RootState) => state.steps.form.topics) || [];
     const selectedDepartment = useSelector((state: RootState) => state.steps.form.department);
 
-    const { data: topics = [], isLoading, isError } = useQuery<Topic[]>({
+    const { data: topics = [] } = useQuery<Topic[]>({
         queryKey: ["topics", selectedDepartment],
         queryFn: async () => {
             if (selectedDepartment) {

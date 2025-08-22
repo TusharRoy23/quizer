@@ -40,7 +40,7 @@ export default function Header() {
 
     useEffect(() => {
         checkAuth();
-    }, []);
+    }, [checkAuth]);
 
     // Update Redux store if authData changes
     useEffect(() => {

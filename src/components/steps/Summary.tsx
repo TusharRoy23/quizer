@@ -40,7 +40,7 @@ const SummaryData = () => {
                                 </TableCell>
                                 <TableCell className="px-5 py-4 text-start">
                                     <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {topics?.map((topic: any) => topic.name).join(", ")}
+                                        {topics?.map((topic: Topic) => topic.name).join(", ")}
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -115,7 +115,7 @@ export default function Summary({ onPreviousStep }: StepProps) {
             if (quizUuid) {
                 router.push(`/quiz/${quizUuid}`);
             }
-        } catch (error) {
+        } catch {
             setIsGenerating(false);
         }
     }

@@ -51,7 +51,7 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                         } else {
                                             newSelected = newSelected.filter(i => i !== index);
                                         }
-                                        onSelect(newSelected as any); // Adjust type if needed
+                                        onSelect(newSelected); // Adjust type if needed
                                     }}
                                     className="w-full"
                                 />

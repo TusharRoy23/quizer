@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
 
-    const { data: departmentList = [], isLoading, isError } = useQuery<Department[]>({
+    const { data: departmentList = [] } = useQuery<Department[]>({
         queryKey: ["departments"],
         queryFn: fetchDepartments,
         retry: 1,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Badge from '../ui/badge/Badge';
 import { Clock } from '@/icons';
 
@@ -11,6 +11,14 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [hasTimeUpFired, setHasTimeUpFired] = useState(false);
 
+    // Memoize the onTimeUp callback to prevent unnecessary re-renders
+    const handleTimeUp = useCallback(() => {
+        if (!hasTimeUpFired) {
+            setHasTimeUpFired(true);
+            onTimeUp();
+        }
+    }, [onTimeUp, hasTimeUpFired]);
+
     useEffect(() => {
         // Reset timer when duration changes (e.g., after page refresh)
         setTimeLeft(duration);
@@ -18,9 +26,8 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
     }, [duration]);
 
     useEffect(() => {
-        if (timeLeft < 0 && !hasTimeUpFired) {
-            setHasTimeUpFired(true);
-            onTimeUp();
+        if (timeLeft < 0) {
+            handleTimeUp();
             return;
         }
 
@@ -29,7 +36,7 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [timeLeft, onTimeUp]);
+    }, [timeLeft, handleTimeUp]); // Now using the memoized callback
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
@@ -39,9 +46,11 @@ export default function Timer({ duration, onTimeUp }: TimerProps) {
 
     return (
         <div>
-            {timeLeft >= 0 && <Badge variant="light" color="info" startIcon={<Clock />}>
-                <h1 className=''>Time Left: {formatTime(timeLeft)}</h1>
-            </Badge>}
+            {timeLeft >= 0 && (
+                <Badge variant="light" color="info" startIcon={<Clock />}>
+                    <h1 className=''>Time Left: {formatTime(timeLeft)}</h1>
+                </Badge>
+            )}
         </div>
     );
 }

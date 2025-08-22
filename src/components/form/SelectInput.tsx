@@ -20,8 +20,8 @@ const SelectInput = <T,>({
   className = "dark:bg-dark-900",
   onChange,
   value,
-  getOptionValue = (option: any) => option.value,
-  getOptionLabel = (option: any) => option.label,
+  getOptionValue = (option: T) => String(option),
+  getOptionLabel = (option => String(option)) as (option: T) => string,
 }: SelectInputProps<T>) => {
   const handleSelectChange = (selectedValue: string) => {
     const selectedOption = options.find(opt =>

@@ -4,6 +4,7 @@ import { QuizResult, StepProps } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { QuizService } from "@/services/quizService";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepProps) {
     const router = useRouter();
@@ -30,13 +31,15 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
                 backBtn={false}
                 onNextStep={isAuthenticated && onGoingQuiz?.uuid ? handleOngoingQuiz : onNextStep}
                 endIcon={(isAuthenticated && onGoingQuiz?.uuid) ? <Clock /> : isAuthenticated ? <PaperPlaneIcon /> : null}
-                startIcon={isAuthenticated ? null : <img
-                    src="https://developers.google.com/identity/images/g-logo.png"
+                startIcon={isAuthenticated ? null : <Image
+                    src={"https://developers.google.com/identity/images/g-logo.png"}
                     alt="Google"
-                    style={{ width: 20, height: 20 }}
+                    width={20}
+                    height={20}
                 />
                 }
             />
+
         </>
     );
 }

@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "developers.google.com",
+        port: "",
+        pathname: "/identity/images/g-logo.png",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

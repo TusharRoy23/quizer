@@ -14,11 +14,17 @@ interface KeywordDetailsProps {
     onClose: () => void;
 }
 
+interface CodeProps {
+    inline?: boolean;
+    className?: string;
+    children?: React.ReactNode;
+}
+
 const MarkdownRenderer = ({ content }: { content: string }) => (
     <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-            code: (({ inline, className, children, ...props }) => {
+            code: (({ inline, className, children, ...props }: CodeProps) => {
                 const match = /language-(\w+)/.exec(className || "");
                 return !inline && match ? (
                     <SyntaxHighlighter
@@ -34,7 +40,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
                         {children}
                     </code>
                 );
-            }) as React.ComponentType<any>,
+            }) as React.ComponentType<CodeProps>,
         }}
     >
         {content}
@@ -64,7 +70,7 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
             setIsFetchingExample(true);
             const fetchedExample = await QuizService.getKeywordExample(keywordUuid);
             setExample(fetchedExample);
-        } catch (error) {
+        } catch {
             setExample("Could not load example at this time.");
         } finally {
             setIsFetchingExample(false);
@@ -96,18 +102,18 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                             {keywordDetails.keyword}
                         </h4>
 
-                        <p className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4">
+                        <span className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4">
                             {keywordDetails.explanation && <MarkdownRenderer content={keywordDetails.explanation} />}
-                        </p>
+                        </span>
                     </div>
 
                     <div className="px-6 py-3 flex-grow-0">
                         {example ? (
                             <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg max-h-[200px] overflow-y-auto">
-                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Example:</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Example:</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
                                     <MarkdownRenderer content={example} />
-                                </p>
+                                </span>
                             </div>
                         ) : (
                             <button

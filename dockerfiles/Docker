@@ -1,0 +1,36 @@
+FROM node:20-alpine AS base
+
+FROM base AS builder
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY src ./src
+COPY public ./public
+COPY next.config.ts .
+COPY tsconfig.json .
+COPY postcss.config.mjs .
+COPY .env .env 
+# Or pass it via build args:
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+RUN npm run build
+
+# CRITICAL: Copy static assets to standalone directory
+RUN cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+
+FROM base AS runner
+WORKDIR /app
+
+RUN addgroup --system --gid 1001 quizer
+RUN adduser --system --uid 1001 quizerfe
+USER quizerfe
+
+# Copy the complete standalone structure
+COPY --from=builder --chown=quizerfe:quizer /app/.next/standalone ./
+COPY --from=builder --chown=quizerfe:quizer /app/.next/standalone/.next ./.next/
+
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "server.js"]

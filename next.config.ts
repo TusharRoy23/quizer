@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  output: "standalone",
+  env: {
+    HOSTNAME: '0.0.0.0'
+  },
 };
 
 export default nextConfig;

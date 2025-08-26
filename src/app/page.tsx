@@ -12,6 +12,7 @@ import { setStep } from "@/store/reducers/stepSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { File } from "@/icons";
 import { useRouter } from "next/navigation";
+import { env } from "@/lib/env";
 
 enum STEPS {
   Intro = 'intro',
@@ -35,7 +36,7 @@ export default function Home() {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/user/auth/google`;
+    window.location.href = `${env.apiUrl}/user/auth/google`;
   };
 
   return (

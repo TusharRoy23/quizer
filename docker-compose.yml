@@ -1,0 +1,53 @@
+# version: '3.8'
+
+services:
+  quizer-fe-dev:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Docker-dev
+    container_name: quizer-fe-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  quizer-fe-prod:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Docker
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: quizer-fe-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - quizer_prod
+  
+  nginx:
+    image: nginx:alpine
+    container_name: quizer-nginx
+    ports:
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS (if you add SSL later)
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - quizer-fe-prod
+    restart: always
+    networks:
+      - quizer_prod
+  
+networks:
+  quizer_prod:
+    driver: bridge

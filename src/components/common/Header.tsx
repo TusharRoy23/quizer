@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AuthService } from "@/services/authService";
 import { ClientDBService } from "@/services/clientDBService";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { setAuthentication } from "@/store/reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";

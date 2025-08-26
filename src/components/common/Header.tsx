@@ -8,6 +8,8 @@ import { setAuthentication } from "@/store/reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useQuery } from "@tanstack/react-query";
+import { setStep } from "@/store/reducers/stepSlice";
+import { STEPS } from "@/utils/enum";
 
 export default function Header() {
     const router = useRouter();
@@ -65,9 +67,15 @@ export default function Header() {
         <header className="sticky top-0 z-10 w-full bg-white/10 shadow-2xl backdrop-blur">
             <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex-none">
-                    <Link href="/" className="cursor-pointer">
+                    <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                            dispatch(setStep(STEPS.Intro));
+                            router.push('/');
+                        }}
+                    >
                         <h1 className="text-xl font-bold text-white">Quizer</h1>
-                    </Link>
+                    </div>
                 </div>
                 {/* add logic to show & hide the dropdown */}
                 {

@@ -1,4 +1,4 @@
-import { Department, Difficulty, ObjectType, Topic } from "@/types";
+import { Department, Difficulty, ObjectType, Topic } from "@/utils/types";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 

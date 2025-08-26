@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table/TableRowSkeleton";
 import { ArrowRight, Grid } from "@/icons";
 import { QuizService } from "@/services/quizService";
-import { PaginatedResponse, QuizResult } from "@/types";
+import { PaginatedResponse, QuizResult } from "@/utils/types";
 import { QueryFunctionContext, useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 

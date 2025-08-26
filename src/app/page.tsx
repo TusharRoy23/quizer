@@ -13,17 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { File } from "@/icons";
 import { useRouter } from "next/navigation";
 import { env } from "@/lib/env";
-
-enum STEPS {
-  Intro = 'intro',
-  UserInfo = 'userinfo',
-  Department = 'department',
-  Topics = 'topics',
-  Difficulty = 'difficulty',
-  QuestionCount = 'question_count',
-  Timer = 'timer',
-  Start = 'start'
-}
+import { STEPS } from "@/utils/enum";
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);

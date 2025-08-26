@@ -1,6 +1,6 @@
 import { ArrowRight } from "@/icons";
 import StepLayout from "../layouts/StepLayout";
-import { StepProps } from "@/types";
+import { StepProps } from "@/utils/types";
 import Input from "../form/InputField";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";

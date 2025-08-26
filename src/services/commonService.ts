@@ -1,5 +1,5 @@
 import { apiClient } from "@/hooks/baseApi";
-import { CustomResponse, PaginatedResponse } from "@/types";
+import { CustomResponse, PaginatedResponse } from "@/utils/types";
 
 export const CommonService = {
     createPaginationFetcher: <T>() => async (

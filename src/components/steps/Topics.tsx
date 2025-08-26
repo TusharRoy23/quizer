@@ -1,4 +1,4 @@
-import { StepProps, Topic } from "@/types";
+import { StepProps, Topic } from "@/utils/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
 import { fetchTopics } from "@/services/topicService";

@@ -1,4 +1,4 @@
-import { Difficulty, StepProps } from "@/types";
+import { Difficulty, StepProps } from "@/utils/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
 import { useDispatch, useSelector } from "react-redux";

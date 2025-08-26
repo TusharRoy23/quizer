@@ -1,4 +1,4 @@
-import { StepProps } from "@/types";
+import { StepProps } from "@/utils/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
 import Input from "../form/InputField";

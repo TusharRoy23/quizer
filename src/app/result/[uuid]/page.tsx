@@ -4,7 +4,7 @@ import Button from "@/components/ui/button/Button";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { CheckCircle } from "@/icons";
 import { QuizService } from "@/services/quizService";
-import { QuizResult } from "@/types";
+import { QuizResult } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 

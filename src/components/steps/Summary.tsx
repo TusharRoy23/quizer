@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Table, TableBody, TableRow, TableCell } from "../ui/table";
-import { QuizRequest, StepProps, Topic } from "@/types";
+import { QuizRequest, StepProps, Topic } from "@/utils/types";
 import StepLayout from "../layouts/StepLayout";
 import { ArrowRight } from "@/icons";
 import { useRouter } from "next/navigation";

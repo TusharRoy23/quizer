@@ -1,5 +1,5 @@
 import { apiClient } from '@/hooks/baseApi';
-import { Department } from '@/types';
+import { Department } from '@/utils/types';
 
 export const fetchDepartments = async (): Promise<Department[]> => {
     const response = await apiClient.get('department/');

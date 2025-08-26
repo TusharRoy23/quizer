@@ -1,6 +1,6 @@
 "use client";
 import { QuizService } from "@/services/quizService";
-import { QuestionKeyword } from "@/types";
+import { QuestionKeyword } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import KeywordDetails from "./KeywordDetails";

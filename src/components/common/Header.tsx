@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import { AuthService } from "@/services/authService";
 import { ClientDBService } from "@/services/clientDBService";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { setAuthentication } from "@/store/reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useQuery } from "@tanstack/react-query";
+import { setStep } from "@/store/reducers/stepSlice";
+import { STEPS } from "@/utils/enum";
 
 export default function Header() {
     const router = useRouter();
@@ -65,9 +66,15 @@ export default function Header() {
         <header className="sticky top-0 z-10 w-full bg-white/10 shadow-2xl backdrop-blur">
             <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex-none">
-                    <Link href="/" className="cursor-pointer">
+                    <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                            dispatch(setStep(STEPS.Intro));
+                            router.push('/');
+                        }}
+                    >
                         <h1 className="text-xl font-bold text-white">Quizer</h1>
-                    </Link>
+                    </div>
                 </div>
                 {/* add logic to show & hide the dropdown */}
                 {
@@ -90,7 +97,7 @@ export default function Header() {
                                 role="menu"
                             >
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                    <li>
+                                    {/* <li>
                                         <Link
                                             href="my-profile"
                                             className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
@@ -98,7 +105,7 @@ export default function Header() {
                                         >
                                             Dashboard
                                         </Link>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <button
                                             onClick={handleLogout}

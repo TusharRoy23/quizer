@@ -1,5 +1,5 @@
 import { apiClient } from "@/hooks/baseApi";
-import { Department, Topic } from "@/types";
+import { Department, Topic } from "@/utils/types";
 
 export const fetchTopics = async (department: Department): Promise<Topic[]> => {
     const response = await apiClient.get<Topic[]>(`department/topic/${department.uuid}/`);

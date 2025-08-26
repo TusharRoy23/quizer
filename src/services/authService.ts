@@ -1,5 +1,5 @@
 import { apiClient } from '@/hooks/baseApi';
-import { Authentication } from '@/types';
+import { Authentication } from '@/utils/types';
 
 export const AuthService = {
     checkAuthentication: async () => {

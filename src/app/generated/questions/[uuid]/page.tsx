@@ -3,7 +3,7 @@ import Question from "@/components/quiz/question";
 import Button from "@/components/ui/button/Button";
 import { ChevronLeft, ChevronRight } from "@/icons";
 import { QuizService } from "@/services/quizService";
-import { Quiz } from "@/types";
+import { Quiz } from "@/utils/types";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";

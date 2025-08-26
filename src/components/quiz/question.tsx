@@ -1,5 +1,5 @@
 
-import { Quiz } from "@/types";
+import { Quiz } from "@/utils/types";
 import ComponentCard from "../common/ComponentCard";
 import Radio from "../form/Radio";
 import Checkbox from "../form/Checkbox";

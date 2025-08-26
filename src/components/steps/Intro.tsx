@@ -1,6 +1,6 @@
 import { Clock, PaperPlaneIcon } from "@/icons";
 import StepLayout from "../layouts/StepLayout";
-import { QuizResult, StepProps } from "@/types";
+import { QuizResult, StepProps } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { QuizService } from "@/services/quizService";
 import { useRouter } from "next/navigation";

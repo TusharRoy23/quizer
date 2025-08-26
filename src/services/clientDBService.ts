@@ -1,5 +1,5 @@
 import { db } from "@/hooks/db";
-import { Quiz } from "@/types";
+import { Quiz } from "@/utils/types";
 
 export const ClientDBService = {
     getQuiz: async (uuid: string) => {

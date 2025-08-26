@@ -1,5 +1,5 @@
 import { apiClient } from "@/hooks/baseApi";
-import { PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/types";
+import { PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
 import { CommonService } from "./commonService"
 
 export const QuizService = {

@@ -1,7 +1,8 @@
-import { ClientDBService } from "@/services/clientDBService";
 import axios from "axios";
+import { env } from "@/lib/env";
+import { ClientDBService } from "@/services/clientDBService";
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/`;
+const API_BASE_URL = `${env.apiUrl}/`;
 
 export const setAccessTokenExpiry = (timestamp: number) => {
     localStorage.setItem("accessTokenExpiry", timestamp.toString());

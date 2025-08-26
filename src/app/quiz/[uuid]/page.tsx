@@ -1,6 +1,6 @@
 "use client";
 import { QuizService } from "../../../services/quizService";
-import { Quiz, QuizTimer } from "@/types";
+import { Quiz, QuizTimer } from "@/utils/types";
 import Question from "@/components/quiz/question";
 import Button from "@/components/ui/button/Button";
 import { CheckLine, ChevronLeft, ChevronRight } from "@/icons";

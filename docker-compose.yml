@@ -1,18 +1,22 @@
-# version: '3.8'
+version: '3.8'
 
 services:
   quizer-fe-dev:
     build:
       context: .
       dockerfile: ./dockerfiles/Docker-dev
+      args:
+        - ENV=development
     container_name: quizer-fe-dev
     ports:
       - "3000:3000"
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/.next  # Add this for better hot reloading
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_ENV=development
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -22,14 +26,13 @@ services:
       context: .
       dockerfile: ./dockerfiles/Docker
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        - ENV=production
     container_name: quizer-fe-prod
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-    env_file:
-      - .env
+      - NEXT_PUBLIC_ENV=production
     restart: always
     networks:
       - quizer_prod

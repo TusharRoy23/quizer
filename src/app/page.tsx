@@ -12,17 +12,8 @@ import { setStep } from "@/store/reducers/stepSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { File } from "@/icons";
 import { useRouter } from "next/navigation";
-
-enum STEPS {
-  Intro = 'intro',
-  UserInfo = 'userinfo',
-  Department = 'department',
-  Topics = 'topics',
-  Difficulty = 'difficulty',
-  QuestionCount = 'question_count',
-  Timer = 'timer',
-  Start = 'start'
-}
+import { env } from "@/lib/env";
+import { STEPS } from "@/utils/enum";
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
@@ -35,7 +26,7 @@ export default function Home() {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/user/auth/google`;
+    window.location.href = `${env.apiUrl}/user/auth/google`;
   };
 
   return (

@@ -1,4 +1,4 @@
-import { UserInfo } from "@/types";
+import { UserInfo } from "@/utils/types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {

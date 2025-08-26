@@ -1,4 +1,4 @@
-import { Quiz } from '@/types';
+import { Quiz } from '@/utils/types';
 import Dexie, { type EntityTable } from 'dexie';
 
 const db = new Dexie('QuizDB') as Dexie & {

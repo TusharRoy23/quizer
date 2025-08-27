@@ -99,7 +99,7 @@ export default function Header() {
                         <div className="relative flex-none" ref={dropdownRef}>
                             <button
                                 onClick={() => setDropdownOpen((open) => !open)}
-                                className="flex items-center gap-2 px-4 py-2 text-white font-bold bg-white/10 dark:bg-white rounded focus:outline-none opacity-80 hover:opacity-100 transition-opacity"
+                                className={"flex items-center gap-2 px-4 py-2 text-gray-300 font-bold bg-white/10 dark:bg-white rounded focus:outline-none opacity-80 hover:opacity-100 transition-opacity"}
                                 aria-haspopup="true"
                                 aria-expanded={dropdownOpen}
                             >

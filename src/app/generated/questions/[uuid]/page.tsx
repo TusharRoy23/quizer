@@ -82,30 +82,33 @@ const QuestionsPage = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
             {isLoading && <div className="text-center py-8">Loading questions...</div>}
 
             {quiz && (
                 <>
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-                        <Question quiz={quiz} onSelect={() => { }} canSelect={false} />
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-auto">
+                        <div className="min-w-0">
+                            <Question quiz={quiz} onSelect={() => { }} canSelect={false} />
 
-                        <div className="mt-6">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                                Related Keywords
-                            </h3>
-                            <KeywordPage questionUuid={quiz.uuid} />
+                            <div className="mt-4 sm:mt-6">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2 sm:mb-3">
+                                    Related Keywords
+                                </h3>
+                                <KeywordPage questionUuid={quiz.uuid} />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
-                        <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mt-4 sm:mt-6">
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
                             <Button
                                 size="sm"
                                 variant="outline"
                                 startIcon={<ChevronLeft />}
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
+                                className="flex-1 sm:flex-none"
                             >
                                 Previous
                             </Button>
@@ -115,6 +118,7 @@ const QuestionsPage = () => {
                                 endIcon={<ChevronRight />}
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === quizList.length}
+                                className="flex-1 sm:flex-none"
                             >
                                 Next
                             </Button>
@@ -124,7 +128,7 @@ const QuestionsPage = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => router.push('/generated')}
-                            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="w-full sm:w-auto text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Back to list
                         </Button>

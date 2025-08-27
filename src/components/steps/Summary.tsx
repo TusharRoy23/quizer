@@ -97,11 +97,13 @@ export default function Summary({ onPreviousStep }: StepProps) {
     const generateQuiz = async () => {
         const { form } = selector;
         setIsGenerating(true);
+
         if (!form.department || !form.topics || !form.difficulty || !form.questionCount) {
             console.error("Please fill all the required fields before generating the quiz.");
             setIsGenerating(false);
             return;
         }
+
         try {
             const { department, topics, difficulty, questionCount, timer } = form;
             const payload: QuizRequest = {
@@ -109,27 +111,43 @@ export default function Summary({ onPreviousStep }: StepProps) {
                 topics: topics?.map((topic: Topic) => topic.uuid),
                 difficulty: difficulty?.value,
                 question_count: +questionCount?.value,
-                timer: timer
-            }
+                timer: timer,
+            };
             const quizUuid = await QuizService.generateQuiz(payload);
+
             if (quizUuid) {
                 router.push(`/quiz/${quizUuid}`);
             }
         } catch {
             setIsGenerating(false);
         }
-    }
+    };
 
     return (
-        <StepLayout
-            title={"Summary"}
-            description={<SummaryData />}
-            btnLabel={isGenerating ? "Starting..." : "Let's Start"}
-            onNextStep={() => generateQuiz()}
-            onPreviousStep={onPreviousStep}
-            endIcon={<ArrowRight />}
-            nextBtnDisabled={isGenerating}
-            prevBtnDisabled={isGenerating}
-        />
+        <div className="relative">
+            <StepLayout
+                title="Summary"
+                description={<SummaryData />}
+                btnLabel={isGenerating ? "Starting..." : "Let's Start"}
+                onNextStep={generateQuiz}
+                onPreviousStep={onPreviousStep}
+                endIcon={<ArrowRight />}
+                nextBtnDisabled={isGenerating}
+                prevBtnDisabled={isGenerating}
+            />
+
+            {/* Fullscreen Loader */}
+            {isGenerating && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-black/70">
+                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="mt-6 text-lg font-semibold text-gray-700 dark:text-gray-200">
+                        Generating your quiz…
+                    </p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        This may take a few minutes ⏳
+                    </p>
+                </div>
+            )}
+        </div>
     );
 }

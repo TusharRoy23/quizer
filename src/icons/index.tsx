@@ -10,6 +10,12 @@ import File from "./file.svg";
 import Folder from "./folder.svg";
 import Grid from "./grid.svg";
 import Alert from "./alert.svg";
+import Trophy from "./trophy.svg";
+import Star from "./star.svg";
+import CheckList from "./checklist.svg";
+import CheckList2 from "./checklist-2.svg";
+import XCircle from "./xcircle.svg";
+import CheckCircle2 from "./check-circle-2.svg";
 
 export {
     PaperPlaneIcon,
@@ -19,9 +25,15 @@ export {
     ChevronDown,
     Clock,
     CheckCircle,
+    CheckCircle2,
     CheckLine,
     File,
     Folder,
     Grid,
-    Alert
+    Alert,
+    Trophy,
+    Star,
+    CheckList,
+    CheckList2,
+    XCircle
 }

@@ -26,20 +26,42 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
         <>
             <StepLayout
                 title={"Welcome to Quizer!"}
-                description={"You can practice your test here."}
-                btnLabel={isAuthenticated ? onGoingQuiz?.uuid ? "Ongoing Quiz" : "Take a quiz" : "Sign in with google"}
+                description={
+                    isAuthenticated
+                        ? "Practice your skills with our quizzes. Track your progress and improve over time."
+                        : "Sign in with Google to start practicing quizzes, save your progress, and unlock personalized features."
+                }
+                btnLabel={
+                    isAuthenticated
+                        ? onGoingQuiz?.uuid
+                            ? "Resume Ongoing Quiz"
+                            : "Take a Quiz"
+                        : "Sign in with Google"
+                }
                 backBtn={false}
-                onNextStep={isAuthenticated && onGoingQuiz?.uuid ? handleOngoingQuiz : onNextStep}
-                endIcon={(isAuthenticated && onGoingQuiz?.uuid) ? <Clock /> : isAuthenticated ? <PaperPlaneIcon /> : null}
-                startIcon={isAuthenticated ? null : <Image
-                    src={"https://developers.google.com/identity/images/g-logo.png"}
-                    alt="Google"
-                    width={20}
-                    height={20}
-                />
+                onNextStep={
+                    isAuthenticated && onGoingQuiz?.uuid
+                        ? handleOngoingQuiz
+                        : onNextStep
+                }
+                endIcon={
+                    isAuthenticated && onGoingQuiz?.uuid
+                        ? <Clock />
+                        : isAuthenticated
+                            ? <PaperPlaneIcon />
+                            : null
+                }
+                startIcon={
+                    isAuthenticated
+                        ? null
+                        : <Image
+                            src={"https://developers.google.com/identity/images/g-logo.png"}
+                            alt="Google"
+                            width={20}
+                            height={20}
+                        />
                 }
             />
-
         </>
     );
 }

@@ -63,7 +63,7 @@ export interface QuizResult {
     difficulty: string;
     question_count: number;
     completed: boolean;
-    score: boolean;
+    score: number;
     total_answers: number;
     total_correct: number;
     created_at: string;

@@ -3,6 +3,7 @@ import { Quiz } from "@/utils/types";
 import ComponentCard from "../common/ComponentCard";
 import Radio from "../form/Radio";
 import Checkbox from "../form/Checkbox";
+import MarkdownRenderer from "../common/MarkdownRenderer";
 
 interface QuestionProps {
     quiz: Quiz;
@@ -13,7 +14,7 @@ interface QuestionProps {
 export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
     return (
         <>
-            <ComponentCard title={quiz.question} className="max-h-[600px] min-h-[200px] max-w-[600px] min-w-[300px] overflow-y-auto">
+            <ComponentCard title={quiz.question} hasCode={true} className="max-h-[600px] min-h-[200px] max-w-[600px] min-w-[300px] overflow-y-auto">
                 <div className="space-y-6 ">
                     {quiz.options.map((option, index) => {
                         if (quiz.question_type === "CHOICE") {
@@ -28,12 +29,16 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                     label={option}
                                 />
                             ) : (
-                                <p key={index}>
-                                    <span className="font-semibold">{index + 1}.</span> {option}.
-                                    {quiz.answer?.join(',') === index.toString() && <span className="text-green-500"> (Correct)</span>}
-                                    {quiz.selected_answer?.join(',') === index.toString() && quiz.selected_answer?.join(',') !== quiz.answer?.join(',')
-                                        && <span className="text-red-500"> (Incorrect)</span>}
-                                </p>
+                                <span key={index} className="flex items-start gap-1">
+                                    <span className="font-semibold">{index + 1}.</span>
+                                    <span className={`inline-flex items-center border-l-4 pl-1 
+                                        ${quiz.answer?.join(',') === index.toString() ? 'border-green-500' : ''} 
+                                        ${quiz.selected_answer?.join(',') === index.toString()
+                                            && quiz.selected_answer?.join(',') !== quiz.answer?.join(',') ? 'border-red-500' : ''}`}
+                                    >
+                                        {option && <MarkdownRenderer content={option} />}
+                                    </span>
+                                </span>
                             )
                         } else if (quiz.question_type === "MULTIPLE_CHOICE") {
                             return canSelect ? (
@@ -56,18 +61,20 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                     className="w-full"
                                 />
                             ) :
-                                (<p key={index}>
-                                    <span className="font-semibold">{index + 1}.</span> {option}
-                                    {quiz.answer?.includes(index) && <span className="text-green-500"> (Correct)</span>}
-                                    {quiz.selected_answer?.includes(index) && quiz.selected_answer?.join(',') !== quiz.answer?.join(',')
-                                        && <span className="text-red-500"> (Incorrect)</span>}
-                                </p>);
+                                (
+                                    <span key={index} className="flex items-start gap-1">
+                                        <span className="font-semibold">{index + 1}.</span>
+                                        <span className={`inline-flex items-center border-l-4 pl-1 ${quiz.answer?.includes(index) ? 'border-green-500' : ''} ${quiz.selected_answer?.includes(index) && !quiz.answer?.includes(index) ? 'border-red-500' : ''}`}>
+                                            {option && <MarkdownRenderer content={option} />}
+                                        </span>
+                                    </span>
+                                );
                         }
                     })}
                     {quiz.explanation && (
                         <div className="mt-4 p-4 bg-gray-100 rounded-md">
                             <h3 className="font-semibold">Explanation:</h3>
-                            <p>{quiz.explanation}</p>
+                            {quiz.explanation && <MarkdownRenderer content={quiz.explanation} />}
                         </div>
                     )}
                 </div>

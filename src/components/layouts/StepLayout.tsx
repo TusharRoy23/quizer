@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import Button from "../ui/button/Button";
 import { ChevronLeft } from "@/icons";
-
 interface StepProps {
     title: string;
     description: string | ReactNode;
@@ -29,7 +28,7 @@ const StepLayout: React.FC<StepProps> = ({
 }) => {
     return (
         <>
-            <div className="w-full max-w-[630px] text-center">
+            <div className={"w-full max-w-[630px] text-center"}>
                 <h3 className="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
                     {title}
                 </h3>

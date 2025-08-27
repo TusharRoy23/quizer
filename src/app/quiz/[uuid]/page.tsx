@@ -147,6 +147,39 @@ export default function QuizPage() {
         router.push(`?page=${validatedPage}`);
     }, [quizList.length, router]);
 
+    // Add keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Only handle left/right arrows if we're not in an input field
+            const isInputField = event.target instanceof HTMLInputElement ||
+                event.target instanceof HTMLTextAreaElement;
+
+            if (isInputField) return;
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                    if (displayPage > 1) {
+                        event.preventDefault();
+                        handlePageChange(displayPage - 1);
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (displayPage < quizList.length) {
+                        event.preventDefault();
+                        handlePageChange(displayPage + 1);
+                    }
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [displayPage, quizList.length, handlePageChange]);
+
     // Validate page number on load and quizList changes
     useEffect(() => {
         if (quizList.length > 0 && displayPage > quizList.length) {

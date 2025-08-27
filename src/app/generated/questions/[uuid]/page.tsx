@@ -34,6 +34,39 @@ const QuestionsPage = () => {
         router.push(`?page=${validatedPage}`);
     }, [quizList.length, router]);
 
+    // Add keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Only handle left/right arrows if we're not in an input field
+            const isInputField = event.target instanceof HTMLInputElement ||
+                event.target instanceof HTMLTextAreaElement;
+
+            if (isInputField) return;
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                    if (currentPage > 1) {
+                        event.preventDefault();
+                        handlePageChange(currentPage - 1);
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (currentPage < quizList.length) {
+                        event.preventDefault();
+                        handlePageChange(currentPage + 1);
+                    }
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [currentPage, quizList.length, handlePageChange]);
+
     useEffect(() => {
         if (quizList.length > 0 && currentPage > quizList.length) {
             handlePageChange(quizList.length);

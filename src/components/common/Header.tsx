@@ -9,6 +9,15 @@ import { RootState } from "@/store";
 import { useQuery } from "@tanstack/react-query";
 import { setStep } from "@/store/reducers/stepSlice";
 import { STEPS } from "@/utils/enum";
+import Image from "next/image";
+import { Roboto } from "next/font/google";
+
+const roboto = Roboto({
+    weight: '700',
+    subsets: ['vietnamese'],
+    display: 'swap',
+    style: 'italic'
+})
 
 export default function Header() {
     const router = useRouter();
@@ -73,7 +82,15 @@ export default function Header() {
                             router.push('/');
                         }}
                     >
-                        <h1 className="text-xl font-bold text-white">Quizer</h1>
+                        <h1 className="flex items-center ">
+                            <Image
+                                src="/images/logo/quizer.png"
+                                alt="Quizer"
+                                width={40}
+                                height={40}
+                            />
+                            <span className={"text-2xl text-gray-300 " + roboto.className}>uizer</span>
+                        </h1>
                     </div>
                 </div>
                 {/* add logic to show & hide the dropdown */}

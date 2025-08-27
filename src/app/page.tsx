@@ -45,7 +45,7 @@ export default function Home() {
               <Button size="sm" variant="outline" endIcon={<File />} onClick={() => {
                 router.push('/generated');
               }}>
-                Generated Questions
+                Quizzes
               </Button>
             </div>}
           </div>

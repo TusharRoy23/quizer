@@ -34,7 +34,7 @@ export default function GeneratedPage() {
             }
             return undefined;
         },
-        retry: 1, // Retry once on failure
+        retry: 1,
     });
     const allLogs = data?.pages.flatMap(page => page.data) || [];
 
@@ -55,53 +55,55 @@ export default function GeneratedPage() {
     };
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-            <div className="w-full max-w-[630px] text-center">
+        <div className="rounded-2xl border border-gray-200 bg-white px-4 py-6 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+            <div className="w-full max-w-[630px] text-center mx-auto">
                 <h3 className="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-                    Generated Questions
+                    Quizzes
                 </h3>
             </div>
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
                 <div className="max-w-full">
                     <Table>
                         <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                             <TableRow>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Date
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Difficulty
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Questions
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Answers
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Correct
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Timer
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         Score
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                <TableCell className="px-4 py-3 sm:px-5 text-start">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                                         #
                                     </div>
@@ -120,42 +122,42 @@ export default function GeneratedPage() {
                             {/* Data Rows */}
                             {allLogs?.map((log) => (
                                 <TableRow key={log.uuid} className="fade-in">
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                                            {log.created_at ? new Date(log.created_at).toUTCString() : '-'}
+                                            {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.difficulty}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.question_count}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.total_answers}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.total_correct}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.timer}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {log.score ? `${log.score}%` : '-'}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                    <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <Button size="sm" variant="outline" endIcon={<ArrowRight />} onClick={() => handleNavigation(log.uuid)}>
                                             Revision
                                         </Button>
@@ -185,6 +187,98 @@ export default function GeneratedPage() {
                         </TableBody>
                     </Table>
                 </div>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4">
+                {/* Loading State */}
+                {isLoading && allLogs.length === 0 && (
+                    <>
+                        {Array(3).fill(0).map((_, i) => (
+                            <div key={`mobile-skeleton-${i}`} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
+                                <div className="space-y-3">
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {/* Data Cards */}
+                {allLogs?.map((log) => (
+                    <div key={log.uuid} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-white/[0.03] fade-in">
+                        <div className="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date</p>
+                                <p className="text-sm text-gray-900 dark:text-white">
+                                    {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Difficulty</p>
+                                <p className="text-sm text-gray-900 dark:text-white">{log.difficulty}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Questions</p>
+                                <p className="text-sm text-gray-900 dark:text-white">{log.question_count}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Score</p>
+                                <p className="text-sm text-gray-900 dark:text-white">
+                                    {log.score ? `${log.score}%` : '-'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Correct</p>
+                                <p className="text-sm text-gray-900 dark:text-white">
+                                    {log.total_correct}/{log.total_answers}
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Timer</p>
+                                <p className="text-sm text-gray-900 dark:text-white">{log.timer}m</p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                endIcon={<ArrowRight />}
+                                onClick={() => handleNavigation(log.uuid)}
+                                className="w-full justify-center"
+                            >
+                                Review Questions
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+
+                {/* Load More for Mobile */}
+                {hasNextPage && (
+                    <div className="text-center pt-4">
+                        {isFetchingNextPage ? (
+                            <div className="flex justify-center">
+                                <div className="h-8 w-8 border-4 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+                            </div>
+                        ) : (
+                            <Button
+                                startIcon={<Grid />}
+                                onClick={() => fetchNextPage()}
+                                variant="outline"
+                                size="sm"
+                                className="w-full justify-center"
+                            >
+                                Load More
+                            </Button>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

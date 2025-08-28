@@ -159,7 +159,7 @@ export default function GeneratedPage() {
                                     </TableCell>
                                     <TableCell className="px-4 py-3 sm:px-5 text-start">
                                         <Button size="sm" variant="outline" endIcon={<ArrowRight />} onClick={() => handleNavigation(log.uuid)}>
-                                            Revision
+                                            Review
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -190,11 +190,11 @@ export default function GeneratedPage() {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden">
                 {/* Loading State */}
                 {isLoading && allLogs.length === 0 && (
-                    <>
-                        {Array(3).fill(0).map((_, i) => (
+                    <div className="grid grid-cols-2 gap-4">
+                        {Array(6).fill(0).map((_, i) => (
                             <div key={`mobile-skeleton-${i}`} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
                                 <div className="space-y-3">
                                     <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -203,61 +203,63 @@ export default function GeneratedPage() {
                                 </div>
                             </div>
                         ))}
-                    </>
+                    </div>
                 )}
 
                 {/* Data Cards */}
-                {allLogs?.map((log) => (
-                    <div key={log.uuid} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-white/[0.03] fade-in">
-                        <div className="grid grid-cols-2 gap-4 mb-3">
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date</p>
-                                <p className="text-sm text-gray-900 dark:text-white">
-                                    {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
-                                </p>
+                <div className="grid grid-cols-2 gap-4">
+                    {allLogs?.map((log) => (
+                        <div key={log.uuid} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-white/[0.03] fade-in">
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">
+                                        {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Difficulty</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">{log.difficulty}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Questions</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">{log.question_count}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Score</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">
+                                        {log.score ? `${log.score}%` : '-'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Difficulty</p>
-                                <p className="text-sm text-gray-900 dark:text-white">{log.difficulty}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Questions</p>
-                                <p className="text-sm text-gray-900 dark:text-white">{log.question_count}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Score</p>
-                                <p className="text-sm text-gray-900 dark:text-white">
-                                    {log.score ? `${log.score}%` : '-'}
-                                </p>
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Correct</p>
-                                <p className="text-sm text-gray-900 dark:text-white">
-                                    {log.total_correct}/{log.total_answers}
-                                </p>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Correct</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">
+                                        {log.total_correct}/{log.total_answers}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Timer</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">{log.timer}m</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Timer</p>
-                                <p className="text-sm text-gray-900 dark:text-white">{log.timer}m</p>
-                            </div>
-                        </div>
 
-                        <div className="flex justify-center">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                endIcon={<ArrowRight />}
-                                onClick={() => handleNavigation(log.uuid)}
-                                className="w-full justify-center"
-                            >
-                                Review Questions
-                            </Button>
+                            <div className="flex justify-center">
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    endIcon={<ArrowRight />}
+                                    onClick={() => handleNavigation(log.uuid)}
+                                    className="w-full justify-center"
+                                >
+                                    Review
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
 
                 {/* Load More for Mobile */}
                 {hasNextPage && (

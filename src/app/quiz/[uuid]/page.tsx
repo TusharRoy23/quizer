@@ -208,37 +208,44 @@ export default function QuizPage() {
     }
 
     return (
-        <>
+        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
             {
-                quizList.length > 0 && timer && timer?.remainingSeconds >= 0 &&
+                quiz && quizList.length > 0 && timer && timer?.remainingSeconds >= 0 &&
                 <div className="flex justify-center mb-4">
                     <Timer duration={timer.remainingSeconds} onTimeUp={() => submitQuiz.mutate()} />
                 </div>
             }
-            {quiz && <Question quiz={quiz} onSelect={onSelectAnswer} canSelect={true} />}
-            {quiz &&
-                <div className="flex justify-center mt-4">
-                    <Button
-                        className="mr-2"
-                        size="sm" variant="outline"
-                        startIcon={<ChevronLeft />}
-                        onClick={() => handlePageChange(displayPage - 1)} disabled={displayPage === 1 || submitQuiz.isPending}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        size="sm" variant="outline"
-                        endIcon={<ChevronRight />}
-                        onClick={() => handlePageChange(displayPage + 1)} disabled={displayPage === quizList.length || submitQuiz.isPending}
-                    >
-                        Next
-                    </Button>
+            {
+                quiz &&
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-auto">
+                    <div className="min-w-0">
+                        <Question quiz={quiz} onSelect={onSelectAnswer} canSelect={true} />
+                    </div>
                 </div>
             }
-            {quizList.length > 0 && quiz &&
-                <div className="flex justify-center mt-4">
+            {
+                quiz &&
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mt-4 sm:mt-6">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <Button
+                            className="flex-1 sm:flex-none"
+                            size="sm" variant="outline"
+                            startIcon={<ChevronLeft />}
+                            onClick={() => handlePageChange(displayPage - 1)} disabled={displayPage === 1 || submitQuiz.isPending}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            className="flex-1 sm:flex-none"
+                            size="sm" variant="outline"
+                            endIcon={<ChevronRight />}
+                            onClick={() => handlePageChange(displayPage + 1)} disabled={displayPage === quizList.length || submitQuiz.isPending}
+                        >
+                            Next
+                        </Button>
+                    </div>
                     <Button
-                        className="mr-2"
+                        className="w-full sm:w-auto text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         size="sm" variant="primary"
                         startIcon={<CheckLine />}
                         onClick={() => submitQuiz.mutate()}
@@ -248,6 +255,6 @@ export default function QuizPage() {
                     </Button>
                 </div>
             }
-        </>
+        </div>
     );
 }

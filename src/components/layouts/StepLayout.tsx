@@ -8,6 +8,7 @@ interface StepProps {
     startIcon?: ReactNode,
     btnLabel: string,
     backBtn?: boolean,
+    errorMessage?: string | null,
     nextBtnDisabled?: boolean,
     prevBtnDisabled?: boolean,
     onNextStep: () => void,
@@ -20,6 +21,7 @@ const StepLayout: React.FC<StepProps> = ({
     endIcon,
     startIcon,
     btnLabel,
+    errorMessage,
     backBtn = true,
     nextBtnDisabled = false,
     prevBtnDisabled = false,
@@ -40,6 +42,12 @@ const StepLayout: React.FC<StepProps> = ({
                     <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
                         {description}
                     </div>
+                )}
+
+                {errorMessage && (
+                    <p className="mb-4 text-sm text-red-500 whitespace-pre-line">
+                        {errorMessage}
+                    </p>
                 )}
             </div>
             <div className="flex justify-center mt-4">

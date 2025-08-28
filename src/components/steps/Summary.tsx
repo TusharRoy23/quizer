@@ -93,10 +93,12 @@ export default function Summary({ onPreviousStep }: StepProps) {
     const router = useRouter();
     const selector = useSelector((state: RootState) => state.steps);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const generateQuiz = async () => {
         const { form } = selector;
         setIsGenerating(true);
+        setError(null);
 
         if (!form.department || !form.topics || !form.difficulty || !form.questionCount) {
             console.error("Please fill all the required fields before generating the quiz.");
@@ -118,7 +120,10 @@ export default function Summary({ onPreviousStep }: StepProps) {
             if (quizUuid) {
                 router.push(`/quiz/${quizUuid}`);
             }
-        } catch {
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
             setIsGenerating(false);
         }
     };
@@ -132,6 +137,7 @@ export default function Summary({ onPreviousStep }: StepProps) {
                 onNextStep={generateQuiz}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}
+                errorMessage={error}
                 nextBtnDisabled={isGenerating}
                 prevBtnDisabled={isGenerating}
             />

@@ -70,8 +70,7 @@ export default function ResultPage() {
                         Great job completing the quiz!
                     </p>
 
-                    {/* 📊 Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4 w-full max-w-xl text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-xl text-sm">
                         <StatItem icon={<Clock className="w-4 h-4" />} label="Time" value={`${result.timer} min`} />
                         <StatItem icon={<Star className="w-4 h-4" />} label="Difficulty" value={result.difficulty.toLocaleUpperCase()} />
                         <StatItem icon={<CheckList className="w-4 h-4" />} label="Questions" value={result.question_count} />

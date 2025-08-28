@@ -133,7 +133,7 @@ export default function QuizPage() {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
             return await QuizService.getQuizTimer(uuid);
         },
-        refetchInterval: 30000, // Refetch every 30 seconds
+        refetchInterval: 10000, // Refetch every 10 seconds
         retry: 1,
         staleTime: 0,
     });
@@ -210,7 +210,7 @@ export default function QuizPage() {
     return (
         <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
             {
-                quiz && quizList.length > 0 && timer && timer?.remainingSeconds >= 0 &&
+                quizList.length > 0 && timer && timer?.remainingSeconds >= 0 &&
                 <div className="flex justify-center mb-4">
                     <Timer duration={timer.remainingSeconds} onTimeUp={() => submitQuiz.mutate()} />
                 </div>
@@ -224,7 +224,7 @@ export default function QuizPage() {
                 </div>
             }
             {
-                quiz &&
+                quizList.length > 0 &&
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mt-4 sm:mt-6">
                     <div className="flex items-center gap-2 w-full sm:w-auto">
                         <Button

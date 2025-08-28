@@ -50,7 +50,7 @@ export default function Timer({ onNextStep = () => { }, onPreviousStep }: StepPr
                         placeholder="Enter time in minutes"
                     />
                 }
-                btnLabel={"Show Summary"}
+                btnLabel={"Next"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}

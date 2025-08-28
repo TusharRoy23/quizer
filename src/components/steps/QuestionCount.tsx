@@ -28,13 +28,13 @@ export default function QuestionCount({ onNextStep = () => { }, onPreviousStep }
                         label=""
                         placeholder="--Select--"
                         options={questionCountArr}
-                        getOptionValue={(dept) => dept.value}
-                        getOptionLabel={(dept) => dept.name}
+                        getOptionValue={(question) => question.value}
+                        getOptionLabel={(question) => question.name}
                         onChange={onSelect}
                         value={questionCount}
                     />
                 }
-                btnLabel={"Set your Timer"}
+                btnLabel={"Next"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}

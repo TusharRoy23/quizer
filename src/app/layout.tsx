@@ -5,7 +5,7 @@ import Header from "@/components/common/Header";
 import React from "react";
 import Providers from "@/store/Providers";
 import QueryProvider from "@/hooks/query-provider";
-import { Inter, Roboto } from 'next/font/google';
+import { Roboto } from 'next/font/google';
 
 export const metadata: Metadata = {
   title: "Quizer",

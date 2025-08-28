@@ -39,7 +39,7 @@ export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep 
                         value={department}
                     />
                 }
-                btnLabel={"Move to Topics"}
+                btnLabel={"Next"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 nextBtnDisabled={department ? false : true}

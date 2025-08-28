@@ -30,7 +30,7 @@ const initialState: IStep = {
         department: undefined,
         topics: [],
         difficulty: undefined,
-        questionCount: { name: "10", value: 10 },
+        questionCount: { name: "5", value: 5 },
         timer: 1
     },
     departmentList: [],

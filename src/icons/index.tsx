@@ -18,6 +18,7 @@ import XCircle from "./xcircle.svg";
 import CheckCircle2 from "./check-circle-2.svg";
 import Calendar from "./calendar.svg";
 import QuestionMark from "./questionmark.svg";
+import HomeIcon from "./home.svg";
 
 export {
     PaperPlaneIcon,
@@ -39,5 +40,6 @@ export {
     CheckList2,
     XCircle,
     Calendar,
-    QuestionMark
+    QuestionMark,
+    HomeIcon
 }

@@ -10,52 +10,8 @@ import { useCallback, useEffect } from "react";
 import KeywordPage from "@/components/quiz/keyword";
 import ErrorDisplay from "@/components/error/errorDisplay";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Loading skeleton component
-const QuestionSkeleton = () => {
-    return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-auto">
-            <div className="min-w-0">
-                {/* Question skeleton */}
-                <div className="animate-pulse">
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-6"></div>
-
-                    {/* Options skeleton */}
-                    <div className="space-y-3">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                        ))}
-                    </div>
-
-                    {/* Keywords skeleton */}
-                    <div className="mt-6">
-                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-                        <div className="flex flex-wrap gap-2">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20"></div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Navigation controls skeleton
-const NavigationSkeleton = () => {
-    return (
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mt-4 sm:mt-6">
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-md w-24 flex-1 sm:flex-none"></div>
-                <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-md w-24 flex-1 sm:flex-none"></div>
-            </div>
-            <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-md w-32 w-full sm:w-auto"></div>
-        </div>
-    );
-};
+import QuestionSkeleton from "@/components/common/QuestionSkeleton";
+import NavigationSkeleton from "@/components/common/NavigationSkeleton";
 
 const QuestionsPage = () => {
     const params = useParams();
@@ -155,19 +111,23 @@ const QuestionsPage = () => {
                     transition={{ duration: 0.4 }}
                     className="flex items-center justify-between mb-6"
                 >
-                    <div className="flex items-center gap-3">
-                        <div className="text-sm font-medium text-gray-300 dark:text-gray-300">
-                            Question {currentPage} of {quizList.length || 0}
+                    {
+                        quizList.length > 0 &&
+                        <div className="flex items-center gap-3">
+                            <div className="text-sm font-medium text-gray-300 dark:text-gray-300">
+                                Question {currentPage} of {quizList.length || 0}
+                            </div>
+                            <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <motion.div
+                                    className="bg-blue-400 h-2 rounded-full"
+                                    initial={{ width: "0%" }}
+                                    animate={{ width: `${(currentPage / (quizList.length || 1)) * 100}%` }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
+                                />
+                            </div>
                         </div>
-                        <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <motion.div
-                                className="bg-blue-400 h-2 rounded-full"
-                                initial={{ width: "0%" }}
-                                animate={{ width: `${(currentPage / (quizList.length || 1)) * 100}%` }}
-                                transition={{ duration: 0.5, ease: "easeOut" }}
-                            />
-                        </div>
-                    </div>
+                    }
+
 
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
@@ -223,27 +183,28 @@ const QuestionsPage = () => {
                                     transition={{ delay: 0.2 }}
                                     className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center"
                                 >
-                                    <div className="flex gap-2 w-full sm:w-auto">
-                                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                    <div className="flex justify-between w-full gap-2 sm:w-auto">
+                                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
                                             <Button
                                                 size="md"
                                                 variant="outline"
                                                 startIcon={<ChevronLeft />}
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
-                                                className="flex-1 sm:flex-none"
+                                                className="w-full"
                                             >
                                                 Previous
                                             </Button>
                                         </motion.div>
-                                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+
+                                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
                                             <Button
                                                 size="md"
                                                 variant="outline"
                                                 endIcon={<ChevronRight />}
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === quizList.length}
-                                                className="flex-1 sm:flex-none"
+                                                className="w-full"
                                             >
                                                 Next
                                             </Button>
@@ -254,6 +215,8 @@ const QuestionsPage = () => {
                                         Use ← → arrow keys to navigate
                                     </div>
                                 </motion.div>
+
+
                             </motion.div>
                         )}
                     </AnimatePresence>

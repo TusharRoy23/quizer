@@ -9,7 +9,9 @@ import { persistor } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import QuizSkeleton from "@/components/common/QuizSkeleton";
 
 export default function QuizPage() {
     const params = useParams();
@@ -17,6 +19,8 @@ export default function QuizPage() {
     const router = useRouter();
     const uuid = params?.uuid;
     const queryClient = useQueryClient();
+    const [remainingTime, setRemainingTime] = useState<number>(0);
+    const remainingTimeRef = useRef(0);
 
     // Get page from URL or default to 1
     const pageParam = searchParams.get("page");
@@ -40,11 +44,10 @@ export default function QuizPage() {
             await ClientDBService.clearAllQuizzes();
             router.push(`/result/${uuid}`);
         },
-
     });
 
     // Fetch quiz list
-    const { data: quizList = [], isError: inQuizListError } = useQuery<Quiz[]>({
+    const { data: quizList = [], isError: inQuizListError, isLoading: isQuizListLoading } = useQuery<Quiz[]>({
         queryKey: ['quizzes', uuid],
         queryFn: async () => {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
@@ -60,7 +63,7 @@ export default function QuizPage() {
     });
 
     // Get current quiz from local DB
-    const { data: quiz } = useQuery({
+    const { data: quiz, isLoading: isQuizLoading } = useQuery({
         queryKey: ['currentQuiz', quizList?.[currentPageIndex]?.uuid],
         queryFn: async () => {
             const currentQuiz = quizList[currentPageIndex];
@@ -126,16 +129,20 @@ export default function QuizPage() {
         }
     });
 
-    // Fetch timer
+    // Fetch timer - only once when component mounts
     const { data: timer, isError: isTimerError } = useQuery<QuizTimer>({
         queryKey: ['quizTimer', uuid],
         queryFn: async () => {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
-            return await QuizService.getQuizTimer(uuid);
+            const timerData = await QuizService.getQuizTimer(uuid);
+            setRemainingTime(timerData.remainingSeconds);
+            remainingTimeRef.current = timerData.remainingSeconds;
+            return timerData;
         },
-        refetchInterval: 10000, // Refetch every 10 seconds
         retry: 1,
         staleTime: 0,
+        refetchInterval: 10000,
+        refetchOnWindowFocus: false, // Prevent refetch on focus
     });
 
     if (isTimerError || inQuizListError) {
@@ -207,54 +214,156 @@ export default function QuizPage() {
         });
     }
 
+    // Animation variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const pageVariants = {
+        initial: { opacity: 0, x: displayPage > 1 ? -20 : 20 },
+        animate: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+        exit: { opacity: 0, x: displayPage > 1 ? 20 : -20, transition: { duration: 0.2 } }
+    };
+
+    if (isQuizListLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+                <QuizSkeleton />
+            </div>
+        );
+    }
+
     return (
-        <div className="max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-            {
-                quizList.length > 0 && timer && timer?.remainingSeconds >= 0 &&
-                <div className="flex justify-center mb-4">
-                    <Timer duration={timer.remainingSeconds} onTimeUp={() => submitQuiz.mutate()} />
-                </div>
-            }
-            {
-                quiz &&
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-auto">
-                    <div className="min-w-0">
-                        <Question quiz={quiz} onSelect={onSelectAnswer} canSelect={true} />
+        <div className="min-h-screen bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+            <div className="max-w-4xl mx-auto">
+                {/* Timer and progress section */}
+                <div
+                    className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
+                >
+                    {quizList.length > 0 && remainingTime && (
+                        <div className="flex justify-center w-full sm:w-auto">
+                            <Timer
+                                duration={remainingTime}
+                                onTimeUp={() => submitQuiz.mutate()}
+                                onTick={(timeLeft) => {
+                                    remainingTimeRef.current = timeLeft;
+                                    setRemainingTime(timeLeft); // Only if you need this for display
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                            Question {displayPage} of {quizList.length}
+                        </div>
+                        <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <motion.div
+                                className="bg-blue-600 h-2 rounded-full"
+                                initial={{ width: "0%" }}
+                                animate={{ width: `${(displayPage / quizList.length) * 100}%` }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                            />
+                        </div>
                     </div>
                 </div>
-            }
-            {
-                quizList.length > 0 &&
-                <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center sm:gap-4 mt-4 sm:mt-6">
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Button
-                            className="flex-1 sm:flex-none"
-                            size="sm" variant="outline"
-                            startIcon={<ChevronLeft />}
-                            onClick={() => handlePageChange(displayPage - 1)} disabled={displayPage === 1 || submitQuiz.isPending}
+
+                <AnimatePresence mode="wait">
+                    {quiz && (
+                        <motion.div
+                            key={displayPage}
+                            variants={pageVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
                         >
-                            Previous
-                        </Button>
-                        <Button
-                            className="flex-1 sm:flex-none"
-                            size="sm" variant="outline"
-                            endIcon={<ChevronRight />}
-                            onClick={() => handlePageChange(displayPage + 1)} disabled={displayPage === quizList.length || submitQuiz.isPending}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                    <Button
-                        className="w-full sm:w-auto text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        size="sm" variant="primary"
-                        startIcon={<CheckLine />}
-                        onClick={() => submitQuiz.mutate()}
-                        disabled={submitQuiz.isPending}
+                            <motion.div
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="visible"
+                                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-gray-700"
+                            >
+                                <motion.div>
+                                    <Question
+                                        quiz={quiz}
+                                        onSelect={onSelectAnswer}
+                                        canSelect={true}
+                                    />
+                                </motion.div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {quizList.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center"
                     >
-                        Submit
-                    </Button>
-                </div>
-            }
+                        <div className="flex justify-between w-full gap-2 sm:w-auto">
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                                <Button
+                                    className="w-full"
+                                    size="md"
+                                    variant="outline"
+                                    startIcon={<ChevronLeft />}
+                                    onClick={() => handlePageChange(displayPage - 1)}
+                                    disabled={displayPage === 1 || submitQuiz.isPending}
+                                >
+                                    Previous
+                                </Button>
+                            </motion.div>
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+                                <Button
+                                    className="w-full"
+                                    size="md"
+                                    variant="outline"
+                                    endIcon={<ChevronRight />}
+                                    onClick={() => handlePageChange(displayPage + 1)}
+                                    disabled={displayPage === quizList.length || submitQuiz.isPending}
+                                >
+                                    Next
+                                </Button>
+                            </motion.div>
+                        </div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full sm:w-auto"
+                        >
+                            <Button
+                                className="w-full"
+                                size="md"
+                                variant="primary"
+                                startIcon={<CheckLine />}
+                                onClick={() => submitQuiz.mutate()}
+                                disabled={submitQuiz.isPending}
+                            >
+                                Submit Quiz
+                            </Button>
+                        </motion.div>
+                    </motion.div>
+                )}
+
+                {/* Keyboard navigation hint */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6"
+                >
+                    Use ← → arrow keys to navigate
+                </motion.div>
+            </div>
         </div>
     );
 }

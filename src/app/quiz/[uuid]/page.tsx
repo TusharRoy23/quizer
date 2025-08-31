@@ -141,7 +141,7 @@ export default function QuizPage() {
         },
         retry: 1,
         staleTime: 0,
-        refetchInterval: 10000,
+        refetchInterval: 15000,
         refetchOnWindowFocus: false, // Prevent refetch on focus
     });
 

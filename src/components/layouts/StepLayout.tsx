@@ -66,18 +66,6 @@ const StepLayout: React.FC<StepProps> = ({
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-8">
-                    <Button
-                        size="md"
-                        variant="primary"
-                        endIcon={endIcon}
-                        startIcon={startIcon}
-                        onClick={onNextStep}
-                        disabled={nextBtnDisabled}
-                        className="flex-1 justify-center"
-                    >
-                        {btnLabel}
-                    </Button>
-
                     {backBtn && (
                         <Button
                             size="md"
@@ -90,6 +78,17 @@ const StepLayout: React.FC<StepProps> = ({
                             Back
                         </Button>
                     )}
+                    <Button
+                        size="md"
+                        variant="primary"
+                        endIcon={endIcon}
+                        startIcon={startIcon}
+                        onClick={onNextStep}
+                        disabled={nextBtnDisabled}
+                        className="flex-1 justify-center"
+                    >
+                        {btnLabel}
+                    </Button>
                 </div>
             </div>
         </div>

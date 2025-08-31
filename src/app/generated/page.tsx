@@ -1,8 +1,6 @@
 "use client";
 import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { TableRowSkeleton } from "@/components/ui/table/TableRowSkeleton";
 import { ArrowRight, Grid, Calendar, Clock, Trophy, CheckCircle2, QuestionMark } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { PaginatedResponse, QuizResult } from "@/utils/types";

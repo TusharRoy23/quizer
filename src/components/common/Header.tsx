@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthService } from "@/services/authService";
 import { ClientDBService } from "@/services/clientDBService";
 import { useRouter } from "next/navigation";
-import { setAuthentication } from "@/store/reducers/authSlice";
+import { setAuthentication, setLoading } from "@/store/reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useQuery } from "@tanstack/react-query";
@@ -41,24 +41,32 @@ export default function Header() {
         }
     }
 
-    const { data: authData, refetch: checkAuth } = useQuery({
+    const { data: authData, isLoading, isError } = useQuery({
         queryKey: ['authStatus'],
         queryFn: AuthService.checkAuthentication,
-        refetchOnWindowFocus: false,
-        retry: false,
+        refetchOnWindowFocus: true, // Only refetch when window gains focus
+        refetchOnMount: true, // Refetch when component mounts
+        refetchOnReconnect: true, // Refetch when regaining connection
+        staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+        retry: 1,
     });
 
+    // Single useEffect to handle auth data updates
     useEffect(() => {
-        checkAuth();
-    }, [checkAuth]);
-
-    // Update Redux store if authData changes
-    useEffect(() => {
-        if (authData?.authenticated) {
+        if (authData) {
             dispatch(setAuthentication(authData));
-            localStorage.setItem("accessTokenExpiry", authData.expiredAt.toString());
+            dispatch(setLoading({ isLoading: false }));
+            if (authData.authenticated && authData.expiredAt) {
+                localStorage.setItem("accessTokenExpiry", authData.expiredAt.toString());
+            }
         }
     }, [authData, dispatch]);
+
+    useEffect(() => {
+        if (isLoading) {
+            dispatch(setLoading({ isLoading: true }));
+        }
+    }, [isLoading]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -70,6 +78,62 @@ export default function Header() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Show error state for user dropdown
+    const UserDropdown = () => {
+        if (isError) {
+            return (
+                <div className="relative flex-none">
+                    <button
+                        className="flex items-center gap-2 px-4 py-2 text-red-300 font-bold bg-white/10 rounded opacity-80 hover:opacity-100 transition-opacity"
+                        onClick={() => window.location.reload()}
+                    >
+                        Auth Error
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </button>
+                </div>
+            );
+        }
+
+        if (!isAuthenticated) {
+            return null;
+        }
+
+        return (
+            <div className="relative flex-none" ref={dropdownRef}>
+                <button
+                    onClick={() => setDropdownOpen((open) => !open)}
+                    className="flex items-center gap-2 px-4 py-2 text-gray-300 font-bold bg-white/10 dark:bg-white rounded focus:outline-none opacity-80 hover:opacity-100 transition-opacity"
+                    aria-haspopup="true"
+                    aria-expanded={dropdownOpen}
+                >
+                    My Account
+                    <svg className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div
+                    id="dropdown"
+                    className={`absolute right-0 z-10 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition-all duration-100 ${dropdownOpen ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible'}`}
+                    role="menu"
+                >
+                    <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                        <li>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                role="menuitem"
+                            >
+                                Sign out
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <header className="sticky top-0 z-10 w-full bg-white/10 shadow-2xl backdrop-blur">
@@ -93,50 +157,8 @@ export default function Header() {
                         </h1>
                     </div>
                 </div>
-                {/* add logic to show & hide the dropdown */}
-                {
-                    isAuthenticated && (
-                        <div className="relative flex-none" ref={dropdownRef}>
-                            <button
-                                onClick={() => setDropdownOpen((open) => !open)}
-                                className={"flex items-center gap-2 px-4 py-2 text-gray-300 font-bold bg-white/10 dark:bg-white rounded focus:outline-none opacity-80 hover:opacity-100 transition-opacity"}
-                                aria-haspopup="true"
-                                aria-expanded={dropdownOpen}
-                            >
-                                My Account
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div
-                                id="dropdown"
-                                className={`absolute right-0 z-10 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transition-all duration-100 ${dropdownOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 invisible'}`}
-                                role="menu"
-                            >
-                                <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                    {/* <li>
-                                        <Link
-                                            href="my-profile"
-                                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                            role="menuitem"
-                                        >
-                                            Dashboard
-                                        </Link>
-                                    </li> */}
-                                    <li>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                            role="menuitem"
-                                        >
-                                            Sign out
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    )
-                }
+
+                <UserDropdown />
             </div>
         </header>
     )

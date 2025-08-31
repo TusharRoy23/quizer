@@ -50,5 +50,9 @@ export const QuizService = {
     getLatestOnGoingQuiz: async (): Promise<QuizResult> => {
         const response = await apiClient.get<QuizResult>(`question/ongoing/quiz/`);
         return response.data;
+    },
+    checkIfParticipatedInQuiz: async (): Promise<boolean> => {
+        const response = await apiClient.get<boolean>(`question/participated/`);
+        return response.data;
     }
 };

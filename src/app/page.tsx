@@ -15,12 +15,22 @@ import { useRouter } from "next/navigation";
 import { env } from "@/lib/env";
 import { STEPS } from "@/utils/enum";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { QuizService } from "@/services/quizService";
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const router = useRouter();
+
+  const { data: hasParticipatedInQuiz } = useQuery<boolean>({
+    queryKey: ['hasParticipatedInQuiz'],
+    queryFn: () => QuizService.checkIfParticipatedInQuiz(),
+    enabled: isAuthenticated,
+    staleTime: 0,
+    retry: 1
+  });
 
   const stepHandler = (step: STEPS) => {
     dispatch(setStep(step));
@@ -89,17 +99,25 @@ export default function Home() {
             )}
 
             {/* Extra Quizzes Button for Intro */}
-            {isAuthenticated && String(step) === STEPS.Intro && (
-              <div className="flex justify-center mt-4">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  endIcon={<File />}
-                  onClick={() => router.push("/generated")}
-                >
-                  Quizzes
-                </Button>
-              </div>
+            {isAuthenticated && hasParticipatedInQuiz && String(step) === STEPS.Intro && (
+              <motion.div
+                key={'extra-quizzes-button'}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 1 }}
+              >
+                <div className="flex justify-center mt-4">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    endIcon={<File />}
+                    onClick={() => router.push("/generated")}
+                  >
+                    Previous Quizzes
+                  </Button>
+                </div>
+              </motion.div>
             )}
           </motion.div>
         </AnimatePresence>

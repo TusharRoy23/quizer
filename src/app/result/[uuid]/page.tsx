@@ -6,6 +6,7 @@ import { QuizService } from "@/services/quizService";
 import { QuizResult } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
+import { File } from "@/icons";
 
 export default function ResultPage() {
     const router = useRouter();
@@ -80,7 +81,7 @@ export default function ResultPage() {
                     </div>
 
                     {/* CTA */}
-                    <div className="mt-8">
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-6">
                         <Button
                             size="sm"
                             variant="primary"
@@ -88,6 +89,14 @@ export default function ResultPage() {
                             onClick={() => router.push("/")}
                         >
                             Test Again
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            endIcon={<File />}
+                            onClick={() => router.push(`/generated/questions/${result?.uuid}`)}
+                        >
+                            Review Answers
                         </Button>
                     </div>
                 </div>

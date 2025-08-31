@@ -9,7 +9,10 @@ import { Roboto } from 'next/font/google';
 
 export const metadata: Metadata = {
   title: "Quizer",
-  description: "Dummy",
+  description: "AI Powered Quiz Application",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 const roboto = Roboto({

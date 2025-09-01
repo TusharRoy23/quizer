@@ -4,11 +4,9 @@ import { Clock } from "@/icons";
 interface TimerProps {
     duration: number;
     onTimeUp: () => void;
-    isActive?: boolean;
-    onTick?: (timeLeft: number) => void;
 }
 
-export default function Timer({ duration, onTimeUp, isActive = true, onTick }: TimerProps) {
+export default function Timer({ duration, onTimeUp }: TimerProps) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [hasTimeUpFired, setHasTimeUpFired] = useState(false);
 
@@ -26,13 +24,13 @@ export default function Timer({ duration, onTimeUp, isActive = true, onTick }: T
     }, [duration]);
 
     useEffect(() => {
-        if (timeLeft < 0) {
+        if (timeLeft <= 0) {
             handleTimeUp();
             return;
         }
 
         const timerId = setInterval(() => {
-            setTimeLeft(prev => prev - 1);
+            setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
         }, 1000);
 
         return () => clearInterval(timerId);

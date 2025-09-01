@@ -53,7 +53,11 @@ export default function QuizPage() {
             await ClientDBService.clearAllQuizzes();
             const response = await QuizService.getQuizList(uuid);
             if (response.length > 0) {
-                await ClientDBService.saveAllQuizzes(response);
+                const data = response.map(quiz => ({
+                    ...quiz,
+                    selected_index: quiz.question_type === "CHOICE" ? (quiz.selected_answer && quiz?.selected_answer[0]) : quiz.selected_answer
+                }))
+                await ClientDBService.saveAllQuizzes(data);
             }
             persistor.purge();
             return response;
@@ -62,7 +66,7 @@ export default function QuizPage() {
     });
 
     // Get current quiz from local DB
-    const { data: quiz, isLoading: isQuizLoading } = useQuery({
+    const { data: quiz } = useQuery({
         queryKey: ['currentQuiz', quizList?.[currentPageIndex]?.uuid],
         queryFn: async () => {
             const currentQuiz = quizList[currentPageIndex];
@@ -77,11 +81,13 @@ export default function QuizPage() {
         mutationFn: async (selectedIdx: number | number[]) => {
             if (!quiz || typeof uuid !== "string") return;
 
+            console.log(quiz);
+
             const updatedQuiz = {
                 ...quiz,
                 uuid: quiz.uuid,
                 selected_index: selectedIdx,
-                question: quiz.question
+                question: quiz.question,
             } as Quiz;
 
             await ClientDBService.saveQuizAnswer(updatedQuiz);

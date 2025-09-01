@@ -9,7 +9,7 @@ import { persistor } from "@/store";
 import { ClientDBService } from "@/services/clientDBService";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizSkeleton from "@/components/common/QuizSkeleton";
 
@@ -20,7 +20,6 @@ export default function QuizPage() {
     const uuid = params?.uuid;
     const queryClient = useQueryClient();
     const [remainingTime, setRemainingTime] = useState<number>(0);
-    const remainingTimeRef = useRef(0);
 
     // Get page from URL or default to 1
     const pageParam = searchParams.get("page");
@@ -136,7 +135,6 @@ export default function QuizPage() {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
             const timerData = await QuizService.getQuizTimer(uuid);
             setRemainingTime(timerData.remainingSeconds);
-            remainingTimeRef.current = timerData.remainingSeconds;
             return timerData;
         },
         retry: 1,
@@ -251,10 +249,6 @@ export default function QuizPage() {
                             <Timer
                                 duration={remainingTime}
                                 onTimeUp={() => submitQuiz.mutate()}
-                                onTick={(timeLeft) => {
-                                    remainingTimeRef.current = timeLeft;
-                                    setRemainingTime(timeLeft); // Only if you need this for display
-                                }}
                             />
                         </div>
                     )}

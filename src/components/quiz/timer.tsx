@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Clock } from "@/icons";
-import { motion } from "framer-motion";
 
 interface TimerProps {
     duration: number;
@@ -12,59 +11,39 @@ interface TimerProps {
 export default function Timer({ duration, onTimeUp, isActive = true, onTick }: TimerProps) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [hasTimeUpFired, setHasTimeUpFired] = useState(false);
-    const [isRunning, setIsRunning] = useState(true);
-    const initialDurationRef = useRef(duration);
-    const timerIdRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleTimeUp = useCallback(() => {
-        if (!hasTimeUpFired && isActive) {
+        if (!hasTimeUpFired) {
             setHasTimeUpFired(true);
-            setIsRunning(false);
             onTimeUp();
         }
-    }, [onTimeUp, hasTimeUpFired, isActive]);
+    }, [onTimeUp, hasTimeUpFired]);
 
-    // Only reset timer if the initial duration changes
     useEffect(() => {
-        if (duration !== initialDurationRef.current) {
-            initialDurationRef.current = duration;
-            setTimeLeft(duration);
-            setHasTimeUpFired(false);
-            setIsRunning(true);
-        }
+        // Reset timer when duration changes (e.g., after page refresh)
+        setTimeLeft(duration);
+        setHasTimeUpFired(false);
     }, [duration]);
 
-    // Handle timer ticks - independent of parent re-renders
     useEffect(() => {
-        if (!isActive || !isRunning) return;
-
-        if (timeLeft <= 0) {
+        if (timeLeft < 0) {
             handleTimeUp();
             return;
         }
 
-        timerIdRef.current = setInterval(() => {
-            setTimeLeft((prev) => {
-                const newTime = prev - 1;
-                if (onTick) onTick(newTime);
-                return newTime;
-            });
+        const timerId = setInterval(() => {
+            setTimeLeft(prev => prev - 1);
         }, 1000);
 
-        return () => {
-            if (timerIdRef.current) {
-                clearInterval(timerIdRef.current);
-            }
-        };
-    }, [timeLeft, handleTimeUp, isActive, isRunning, onTick]);
+        return () => clearInterval(timerId);
+    }, [timeLeft, handleTimeUp]); // Now using the memoized callback
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
+        if (minutes < 0 || secs < 0) return "00:00";
         return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
     };
-
-    if (!isActive) return null;
 
     return (
         <div

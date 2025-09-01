@@ -26,6 +26,11 @@ export default function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    const jumpToHome = () => {
+        dispatch(setStep(STEPS.Intro));
+        router.push('/');
+    }
+
     const handleLogout = async () => {
         try {
             const data = await AuthService.logout();
@@ -33,7 +38,7 @@ export default function Header() {
                 localStorage.clear();
                 dispatch(setAuthentication({ authenticated: false, user: undefined }));
                 ClientDBService.clearAllQuizzes();
-                router.push('/');
+                jumpToHome();
             }
         }
         catch (error) {
@@ -131,10 +136,7 @@ export default function Header() {
                 <div className="flex-none">
                     <div
                         className="cursor-pointer"
-                        onClick={() => {
-                            dispatch(setStep(STEPS.Intro));
-                            router.push('/');
-                        }}
+                        onClick={() => jumpToHome()}
                     >
                         <h1 className="flex items-center ">
                             <Image

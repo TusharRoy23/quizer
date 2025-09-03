@@ -22,6 +22,13 @@ const Radio: React.FC<RadioProps> = ({
   className = "",
   disabled = false,
 }) => {
+  // Handle keyboard events to prevent arrow key navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent arrow keys from changing selection
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
   return (
     <label
       htmlFor={id}
@@ -40,6 +47,7 @@ const Radio: React.FC<RadioProps> = ({
           onChange={() => !disabled && onChange(value)}
           className="sr-only"
           disabled={disabled}
+          onKeyDown={handleKeyDown}
         />
         <span
           className={`flex h-5 w-5 items-center justify-center rounded-full border-[1.25px] ${checked

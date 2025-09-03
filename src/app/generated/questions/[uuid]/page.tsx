@@ -127,18 +127,21 @@ const QuestionsPage = () => {
                             </div>
                         </div>
                     }
+                    {
+                        quizList.length > 0 &&
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => router.push('/generated')}
+                                className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                                Back to list
+                            </Button>
+                        </motion.div>
+                    }
 
 
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => router.push('/generated')}
-                            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                            Back to list
-                        </Button>
-                    </motion.div>
                 </motion.div>
 
                 {isLoading ? (

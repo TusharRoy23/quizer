@@ -81,8 +81,6 @@ export default function QuizPage() {
         mutationFn: async (selectedIdx: number | number[]) => {
             if (!quiz || typeof uuid !== "string") return;
 
-            console.log(quiz);
-
             const updatedQuiz = {
                 ...quiz,
                 uuid: quiz.uuid,
@@ -165,7 +163,15 @@ export default function QuizPage() {
             const isInputField = event.target instanceof HTMLInputElement ||
                 event.target instanceof HTMLTextAreaElement;
 
-            if (isInputField) return;
+            // Check if we're dealing with a radio button
+            const isRadioButton = event.target instanceof HTMLInputElement &&
+                event.target.type === 'radio';
+
+            // Check if we're dealing with a radio button
+            const isCheckbox = event.target instanceof HTMLInputElement &&
+                event.target.type === 'checkbox';
+
+            if (isInputField && !isRadioButton && !isCheckbox) return;
 
             switch (event.key) {
                 case 'ArrowLeft':

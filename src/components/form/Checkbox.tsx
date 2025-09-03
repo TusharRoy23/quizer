@@ -18,6 +18,14 @@ const Checkbox: React.FC<CheckboxProps> = ({
   className = "",
   disabled = false,
 }) => {
+  // Handle keyboard events to prevent arrow key navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent arrow keys from changing selection
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
   return (
     <label
       className={`flex items-start space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
@@ -33,6 +41,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
             checked={checked}
             onChange={(e) => onChange(e.target.checked)}
             disabled={disabled}
+            onKeyDown={handleKeyDown}
           />
           {checked && (
             <svg

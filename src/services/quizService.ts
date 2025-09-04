@@ -23,7 +23,6 @@ export const QuizService = {
         const response = await apiClient.get<QuizResult>(`question/quiz/${logUuid}/result/`);
         return response.data;
     },
-
     getQuizLogList: async ({ page, limit }: { page: number, limit: number } = { page: 1, limit: 10 }): Promise<PaginatedResponse<QuizResult>> => {
         return CommonService.createPaginationFetcher<QuizResult>()('question/logs', page, limit);
     },
@@ -53,6 +52,10 @@ export const QuizService = {
     },
     checkIfParticipatedInQuiz: async (): Promise<boolean> => {
         const response = await apiClient.get<boolean>(`question/participated/`);
+        return response.data;
+    },
+    getExplanationForQuestion: async (questionUuid: string): Promise<string> => {
+        const response = await apiClient.get<string>(`question/explanation/${questionUuid}/`);
         return response.data;
     }
 };

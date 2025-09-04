@@ -4,6 +4,8 @@ import ComponentCard from "../common/ComponentCard";
 import Radio from "../form/Radio";
 import Checkbox from "../form/Checkbox";
 import MarkdownRenderer from "../common/MarkdownRenderer";
+import { useQuery } from "@tanstack/react-query";
+import { QuizService } from "@/services/quizService";
 
 interface QuestionProps {
     quiz: Quiz;
@@ -12,6 +14,12 @@ interface QuestionProps {
 }
 
 export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
+    const { data: explanation, isLoading, isError } = useQuery<string>({
+        queryKey: ['explanation', quiz.uuid],
+        queryFn: () => QuizService.getExplanationForQuestion(quiz.uuid),
+        enabled: !quiz.explanation && !canSelect, // Only fetch if explanation is not already present and user cannot select
+    });
+
     return (
         <>
             <ComponentCard title={quiz.question} hasCode={true} className="max-h-[600px] min-h-[200px] max-w-[600px] min-w-[300px] overflow-y-auto">
@@ -71,12 +79,20 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                 );
                         }
                     })}
-                    {quiz.explanation && (
-                        <div className="mt-4 p-4 bg-gray-100 rounded-md">
-                            <h3 className="font-semibold">Explanation:</h3>
-                            {quiz.explanation && <MarkdownRenderer content={quiz.explanation} />}
+                    {
+                        (isError || isLoading || quiz.explanation || explanation) &&
+                        <div className={`mt-4 p-4 bg-gray-100 rounded-md${isLoading ? " animate-pulse" : ""}`}>
+                            {isError && <p className="text-red-500">Failed to load explanation.</p>}
+                            {isLoading && <p>Loading explanation...</p>}
+                            {
+                                <>
+                                    {(quiz.explanation || explanation) && <h3 className="font-semibold">Explanation:</h3>}
+                                    {quiz.explanation && <MarkdownRenderer content={quiz.explanation} />}
+                                    {explanation && <MarkdownRenderer content={explanation} />}
+                                </>
+                            }
                         </div>
-                    )}
+                    }
                 </div>
             </ComponentCard>
         </>

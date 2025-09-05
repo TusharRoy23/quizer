@@ -1,11 +1,11 @@
-
 import { Quiz } from "@/utils/types";
 import ComponentCard from "../common/ComponentCard";
 import Radio from "../form/Radio";
 import Checkbox from "../form/Checkbox";
 import MarkdownRenderer from "../common/MarkdownRenderer";
-import { useQuery } from "@tanstack/react-query";
+import TypewriterRenderer from "../common/TypewriterRenderer";
 import { QuizService } from "@/services/quizService";
+import { useState, useEffect, useRef } from "react";
 
 interface QuestionProps {
     quiz: Quiz;
@@ -14,11 +14,74 @@ interface QuestionProps {
 }
 
 export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
-    const { data: explanation, isLoading, isError } = useQuery<string>({
-        queryKey: ['explanation', quiz.uuid],
-        queryFn: () => QuizService.getExplanationForQuestion(quiz.uuid),
-        enabled: !quiz.explanation && !canSelect, // Only fetch if explanation is not already present and user cannot select
-    });
+    const [fullExplanation, setFullExplanation] = useState("");
+    const [isStreaming, setIsStreaming] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
+    const [streamError, setStreamError] = useState<string | null>(null);
+    const abortControllerRef = useRef<(() => void) | null>(null);
+
+    // Start streaming when component mounts and conditions are met
+    useEffect(() => {
+        if (!canSelect && !isStreaming && !isTyping && !quiz.explanation) {
+            startStreaming();
+        }
+
+        // Cleanup function to abort streaming when component unmounts
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current();
+            }
+        };
+    }, [quiz.explanation, !canSelect]);
+
+    const startStreaming = async () => {
+        setIsStreaming(true);
+        setFullExplanation("");
+        setStreamError(null);
+
+        try {
+            abortControllerRef.current = await QuizService.getStreamedExplanationForQuestion(
+                `stream/${quiz.uuid}/`,
+                (completeText) => {
+                    // Received complete text
+                    setFullExplanation(completeText);
+                    // quiz.explanation = completeText;
+                    setIsStreaming(false);
+                },
+                (chunk) => {
+                    setFullExplanation(prev => prev + chunk);
+                    // setFullExplanation(chunk);
+                    setIsStreaming(true);
+                    setIsTyping(true);
+                },
+                (error) => {
+                    console.error('Stream error:', error);
+                    setIsStreaming(false);
+                    setIsTyping(false);
+                    setStreamError('Failed to stream explanation');
+                }
+            );
+
+        } catch (error) {
+            console.error('Failed to start streaming:', error);
+            setIsStreaming(false);
+            setIsTyping(false);
+            setStreamError('Failed to start streaming');
+        }
+    };
+
+    const retryStreaming = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current();
+            abortControllerRef.current = null;
+        }
+        startStreaming();
+    };
+
+    const handleTypingComplete = () => {
+        quiz.explanation = fullExplanation;
+        setIsTyping(false);
+    };
 
     return (
         <>
@@ -64,7 +127,7 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                         } else {
                                             newSelected = newSelected.filter(i => i !== index);
                                         }
-                                        onSelect(newSelected); // Adjust type if needed
+                                        onSelect(newSelected);
                                     }}
                                     className="w-full"
                                 />
@@ -79,20 +142,45 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                 );
                         }
                     })}
-                    {
-                        (isError || isLoading || quiz.explanation || explanation) &&
-                        <div className={`mt-4 p-4 bg-gray-100 rounded-md${isLoading ? " animate-pulse" : ""}`}>
-                            {isError && <p className="text-red-500">Failed to load explanation.</p>}
-                            {isLoading && <p>Loading explanation...</p>}
-                            {
+
+                    {/* Explanation section */}
+                    {(isStreaming || quiz.explanation || fullExplanation || streamError) && (
+                        <div className={`mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-md${isStreaming && !isTyping ? " animate-pulse" : ""}`}>
+                            {streamError && (
+                                <div className="mb-2">
+                                    <p className="text-red-500">{streamError}</p>
+                                    <button
+                                        onClick={retryStreaming}
+                                        className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                                    >
+                                        Retry Streaming
+                                    </button>
+                                </div>
+                            )}
+                            {isStreaming && !isTyping && (
+                                <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                                    <p>Generating explanation...</p>
+                                </div>
+                            )}
+
+                            {(quiz.explanation || fullExplanation) && (
                                 <>
-                                    {(quiz.explanation || explanation) && <h3 className="font-semibold">Explanation:</h3>}
+                                    <h3 className="font-semibold text-lg mb-2">Explanation:</h3>
                                     {quiz.explanation && <MarkdownRenderer content={quiz.explanation} />}
-                                    {explanation && <MarkdownRenderer content={explanation} />}
+
+                                    {/* Typewriter effect for streaming explanation */}
+                                    {fullExplanation && !quiz.explanation && (
+                                        <TypewriterRenderer
+                                            text={fullExplanation}
+                                            speed={8}
+                                            onComplete={handleTypingComplete}
+                                        />
+                                    )}
                                 </>
-                            }
+                            )}
                         </div>
-                    }
+                    )}
                 </div>
             </ComponentCard>
         </>

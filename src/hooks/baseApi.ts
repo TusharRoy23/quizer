@@ -33,7 +33,7 @@ const clearLocalStorageAndDB = () => {
 
 let refreshPromise: Promise<void> | null = null;
 
-const callRefreshToken = async () => {
+export const callRefreshToken = async () => {
     if (!refreshPromise) {
         refreshPromise = axios
             .get(`${API_BASE_URL}user/auth/refresh`, { withCredentials: true })

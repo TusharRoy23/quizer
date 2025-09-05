@@ -1,6 +1,14 @@
-import { apiClient } from "@/hooks/baseApi";
+import { apiClient, callRefreshToken, isAccessTokenExpiringSoon } from "@/hooks/baseApi";
 import { PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
 import { CommonService } from "./commonService"
+import { env } from "@/lib/env";
+
+// Create a utility function to check and refresh token
+const ensureValidToken = async (): Promise<void> => {
+    if (localStorage.getItem("accessTokenExpiry") && isAccessTokenExpiringSoon()) {
+        await callRefreshToken();
+    }
+};
 
 export const QuizService = {
     getQuizList: async (uuid: string) => {
@@ -57,5 +65,64 @@ export const QuizService = {
     getExplanationForQuestion: async (questionUuid: string): Promise<string> => {
         const response = await apiClient.get<string>(`question/explanation/${questionUuid}/`);
         return response.data;
+    },
+    getStreamedExplanationForQuestion: async (
+        apiUrl: string,
+        onComplete: (fullText: string) => void, // Changed from onData to onComplete
+        onChunk: (chunk: string) => void,
+        onError: (error: Error) => void
+    ): Promise<() => void> => {
+        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+        try {
+            // Ensure we have a valid token before making the request
+            await ensureValidToken();
+            const response = await fetch(`${env.apiUrl}/question/explanation/${apiUrl}`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
+            }
+
+            if (!response.body) {
+                throw new Error('Response body is null');
+            }
+
+            reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            const processStream = async () => {
+                try {
+                    while (true) {
+                        const { done, value } = await reader!.read();
+
+                        if (done) {
+                            onComplete(fullText); // Send complete text at once
+                            break;
+                        }
+
+                        const textChunk = decoder.decode(value, { stream: true });
+                        fullText += textChunk;
+                        onChunk(textChunk);
+                    }
+                } catch (error) {
+                    onError(error as Error);
+                } finally {
+                    reader!.releaseLock();
+                }
+            };
+
+            processStream();
+
+            return () => {
+                reader!.cancel().catch(() => { });
+            };
+
+        } catch (error) {
+            onError(error as Error);
+            return () => { };
+        }
     }
 };

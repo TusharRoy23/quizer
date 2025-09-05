@@ -297,6 +297,7 @@ export default function QuizPage() {
                             >
                                 <motion.div>
                                     <Question
+                                        key={quiz.uuid}
                                         quiz={quiz}
                                         onSelect={onSelectAnswer}
                                         canSelect={true}

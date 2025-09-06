@@ -46,7 +46,7 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                     // Received complete text
                     setFullExplanation(completeText);
                     setIsStreaming(false);
-                    quiz.explanation = fullExplanation;
+                    quiz.explanation = completeText;
                     setIsTyping(false);
                 },
                 (chunk) => {
@@ -74,11 +74,6 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
             abortControllerRef.current = null;
         }
         startStreaming();
-    };
-
-    const handleTypingComplete = () => {
-        quiz.explanation = fullExplanation;
-        setIsTyping(false);
     };
 
     return (

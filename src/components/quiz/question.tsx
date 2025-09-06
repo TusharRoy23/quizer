@@ -46,6 +46,8 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                     // Received complete text
                     setFullExplanation(completeText);
                     setIsStreaming(false);
+                    quiz.explanation = fullExplanation;
+                    setIsTyping(false);
                 },
                 (chunk) => {
                     setFullExplanation(prev => prev + chunk);
@@ -167,11 +169,12 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
 
                                     {/* Typewriter effect for streaming explanation */}
                                     {fullExplanation && !quiz.explanation && (
-                                        <TypewriterRenderer
-                                            text={fullExplanation}
-                                            speed={5}
-                                            onComplete={handleTypingComplete}
-                                        />
+                                        // <TypewriterRenderer
+                                        //     text={fullExplanation}
+                                        //     speed={5}
+                                        //     onComplete={handleTypingComplete}
+                                        // />
+                                        <MarkdownRenderer content={fullExplanation} />
                                     )}
                                 </>
                             )}

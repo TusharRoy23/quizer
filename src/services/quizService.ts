@@ -66,7 +66,7 @@ export const QuizService = {
         const response = await apiClient.get<string>(`question/explanation/${questionUuid}/`);
         return response.data;
     },
-    getStreamedExplanationForQuestion: async (
+    getStreamedExplanation: async (
         apiUrl: string,
         onComplete: (fullText: string) => void, // Changed from onData to onComplete
         onChunk: (chunk: string) => void,

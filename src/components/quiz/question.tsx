@@ -40,22 +40,19 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
         setStreamError(null);
 
         try {
-            abortControllerRef.current = await QuizService.getStreamedExplanationForQuestion(
+            abortControllerRef.current = await QuizService.getStreamedExplanation(
                 `stream/${quiz.uuid}/`,
                 (completeText) => {
                     // Received complete text
                     setFullExplanation(completeText);
-                    // quiz.explanation = completeText;
                     setIsStreaming(false);
                 },
                 (chunk) => {
                     setFullExplanation(prev => prev + chunk);
-                    // setFullExplanation(chunk);
                     setIsStreaming(true);
                     setIsTyping(true);
                 },
                 (error) => {
-                    console.error('Stream error:', error);
                     setIsStreaming(false);
                     setIsTyping(false);
                     setStreamError('Failed to stream explanation');
@@ -63,7 +60,6 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
             );
 
         } catch (error) {
-            console.error('Failed to start streaming:', error);
             setIsStreaming(false);
             setIsTyping(false);
             setStreamError('Failed to start streaming');
@@ -173,7 +169,7 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                                     {fullExplanation && !quiz.explanation && (
                                         <TypewriterRenderer
                                             text={fullExplanation}
-                                            speed={8}
+                                            speed={5}
                                             onComplete={handleTypingComplete}
                                         />
                                     )}

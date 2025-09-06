@@ -1,6 +1,6 @@
 import { QuizService } from "@/services/quizService";
 import { QuestionKeyword } from "@/utils/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,7 @@ interface KeywordDetailsProps {
 }
 
 const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
+    const queryClient = useQueryClient();
     const [example, setExample] = useState<string | null>(null);
     const [isFetchingExample, setIsFetchingExample] = useState(false);
 
@@ -42,9 +43,6 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                     // Received complete text
                     setFullExplanation(completeText);
                     setIsStreaming(false);
-                    if (keywordDetails?.explanation) {
-                        keywordDetails.explanation = completeText;
-                    }
                 },
                 (chunk) => {
                     setFullExplanation(prev => prev + chunk);
@@ -110,6 +108,18 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
 
     const handleTypingComplete = () => {
         setIsTyping(false);
+        queryClient.setQueryData<QuestionKeyword>(
+            ["keywordDetails", keywordUuid],
+            (oldData) => {
+                if (oldData) {
+                    return {
+                        ...oldData,
+                        explanation: fullExplanation
+                    };
+                }
+                return oldData;
+            }
+        );
     }
 
     return (
@@ -148,9 +158,6 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                             {keywordDetails.keyword}
                         </h4>
 
-                        {/* <span className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4">
-                            {keywordDetails.explanation && <MarkdownRenderer content={keywordDetails.explanation} />}
-                        </span> */}
                         {isStreaming && !isTyping && (
                             <div className="flex items-center">
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
@@ -169,7 +176,7 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                             )}
                         </span>
                     </div>
-                    {!isTyping && !isStreaming && !keywordDetails.explanation && (
+                    {!isTyping && !isStreaming && (
                         <div className="px-6 py-3 flex-grow-0">
                             {example ? (
                                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg max-h-[200px] overflow-y-auto">

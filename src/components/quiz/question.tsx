@@ -3,7 +3,6 @@ import ComponentCard from "../common/ComponentCard";
 import Radio from "../form/Radio";
 import Checkbox from "../form/Checkbox";
 import MarkdownRenderer from "../common/MarkdownRenderer";
-import TypewriterRenderer from "../common/TypewriterRenderer";
 import { QuizService } from "@/services/quizService";
 import { useState, useEffect, useRef } from "react";
 
@@ -11,9 +10,10 @@ interface QuestionProps {
     quiz: Quiz;
     onSelect: (selectedIdx: number | number[]) => void,
     canSelect?: boolean;
+    onReturn?: (quiz: Quiz) => void
 }
 
-export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
+export default function Question({ quiz, onSelect, canSelect, onReturn }: QuestionProps) {
     const [fullExplanation, setFullExplanation] = useState("");
     const [isStreaming, setIsStreaming] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
@@ -48,6 +48,9 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
                     setIsStreaming(false);
                     quiz.explanation = completeText;
                     setIsTyping(false);
+                    if (onReturn) {
+                        onReturn(quiz);
+                    }
                 },
                 (chunk) => {
                     setFullExplanation(prev => prev + chunk);
@@ -164,11 +167,6 @@ export default function Question({ quiz, onSelect, canSelect }: QuestionProps) {
 
                                     {/* Typewriter effect for streaming explanation */}
                                     {fullExplanation && !quiz.explanation && (
-                                        // <TypewriterRenderer
-                                        //     text={fullExplanation}
-                                        //     speed={5}
-                                        //     onComplete={handleTypingComplete}
-                                        // />
                                         <MarkdownRenderer content={fullExplanation} />
                                     )}
                                 </>

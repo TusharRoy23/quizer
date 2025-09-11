@@ -10,19 +10,22 @@ import Button from "@/components/ui/button/Button";
 import { RootState } from "@/store";
 import { setStep } from "@/store/reducers/stepSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { File } from "@/icons";
+import { File, PaperPlaneIcon } from "@/icons";
 import { useRouter } from "next/navigation";
 import { env } from "@/lib/env";
 import { STEPS } from "@/utils/enum";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { QuizService } from "@/services/quizService";
+import Input from "@/components/form/InputField";
+import { useRef, useState } from "react";
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [searchText, setSearchText] = useState<string | null>(null);
 
   const { data: hasParticipatedInQuiz } = useQuery<boolean>({
     queryKey: ['hasParticipatedInQuiz'],
@@ -39,6 +42,29 @@ export default function Home() {
   const handleGoogleLogin = () => {
     window.location.href = `${env.apiUrl}/user/auth/google`;
   };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
+  }
+
+  const generateSearch = async () => {
+    const trimmedText = searchText?.trim();
+    if (!trimmedText) return;
+
+    // Basic validation - limit length and remove potentially harmful characters
+    if (trimmedText.length > 100) {
+      alert('Search query too long');
+      return;
+    }
+
+    // Remove or escape potentially problematic characters
+    const safeText = trimmedText.replace(/[<>]/g, '');
+
+    router.push(`/search?query=${encodeURIComponent(safeText)}`);
+
+    // await QuizService.getQuestionsByQuery(searchText);
+  }
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -117,6 +143,15 @@ export default function Home() {
                     Previous Quizzes
                   </Button>
                 </div>
+                <Input onChange={onChange} />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  endIcon={<PaperPlaneIcon />}
+                  onClick={generateSearch}
+                >
+                  Search
+                </Button>
               </motion.div>
             )}
           </motion.div>

@@ -62,6 +62,10 @@ export const QuizService = {
         const response = await apiClient.get<boolean>(`question/participated/`);
         return response.data;
     },
+    getQuestionsByQuery: async (query: string): Promise<Quiz[]> => {
+        const response = await apiClient.post<Quiz[]>('question/list/search', { query });
+        return response.data;
+    },
     getExplanationForQuestion: async (questionUuid: string): Promise<string> => {
         const response = await apiClient.get<string>(`question/explanation/${questionUuid}/`);
         return response.data;

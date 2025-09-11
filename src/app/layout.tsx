@@ -6,6 +6,7 @@ import React from "react";
 import Providers from "@/store/Providers";
 import QueryProvider from "@/hooks/query-provider";
 import { Roboto } from 'next/font/google';
+import FloatingSearch from "@/components/common/FloatingSearch";
 
 export const metadata: Metadata = {
   title: "Quizer",
@@ -38,6 +39,7 @@ export default function RootLayout({
                 {children}
               </div>
             </div>
+            <FloatingSearch />
           </QueryProvider>
         </Providers>
       </body>

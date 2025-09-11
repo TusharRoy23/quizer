@@ -19,6 +19,9 @@ import CheckCircle2 from "./check-circle-2.svg";
 import Calendar from "./calendar.svg";
 import QuestionMark from "./questionmark.svg";
 import HomeIcon from "./home.svg";
+import SearchListIcon from "./search-list.svg";
+import PlusIcon from "./plus.svg";
+import PlusSquare from "./plus-square.svg";
 
 export {
     PaperPlaneIcon,
@@ -41,5 +44,8 @@ export {
     XCircle,
     Calendar,
     QuestionMark,
-    HomeIcon
+    HomeIcon,
+    SearchListIcon,
+    PlusIcon,
+    PlusSquare
 }

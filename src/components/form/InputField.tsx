@@ -1,12 +1,15 @@
-import React, { FC } from "react";
+import React, { FC, Ref } from "react";
 
 interface InputProps {
     type?: "text" | "number" | "email" | "password" | "date" | "time" | string;
     id?: string;
+    ref?: Ref<HTMLInputElement>;
     name?: string;
     placeholder?: string;
     defaultValue?: string | number;
+    value?: string | number; // Added value prop for controlled components
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
     min?: number;
     max?: number;
@@ -18,13 +21,15 @@ interface InputProps {
     hint?: string; // Optional hint text
 }
 
-const Input: FC<InputProps> = ({
+const Input: FC<InputProps> = React.forwardRef<HTMLInputElement, InputProps>(({
     type = "text",
     id,
     name,
     placeholder,
     defaultValue,
+    value,
     onChange,
+    onKeyDown,
     className = "",
     min,
     max,
@@ -34,7 +39,7 @@ const Input: FC<InputProps> = ({
     success = false,
     error = false,
     hint,
-}) => {
+}, ref) => {
     // Determine input styles based on state (disabled, success, error)
     let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
 
@@ -85,7 +90,10 @@ const Input: FC<InputProps> = ({
         }
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDownInternal = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Call external onKeyDown if provided
+        onKeyDown?.(e);
+
         if (type !== "number") return;
 
         // Prevent invalid key presses
@@ -116,15 +124,17 @@ const Input: FC<InputProps> = ({
     return (
         <div className="relative">
             <input
+                ref={ref}
                 type={type}
                 id={id}
                 name={name}
                 placeholder={placeholder}
                 defaultValue={defaultValue}
+                value={value}
                 onChange={handleChange}
+                onKeyDown={handleKeyDownInternal}
                 min={min}
                 max={max}
-                onKeyDown={handleKeyDown}
                 step={allowDecimal ? step : 1}
                 disabled={disabled}
                 className={inputClasses}
@@ -145,6 +155,8 @@ const Input: FC<InputProps> = ({
             )}
         </div>
     );
-};
+});
+
+Input.displayName = "Input";
 
 export default Input;

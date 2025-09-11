@@ -14,7 +14,7 @@ const SearchResultPage = () => {
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
     const { data: quizList = [], isLoading, error, isError } = useQuery<Quiz[]>({
-        queryKey: ['searchQuestions'],
+        queryKey: ['searchQuestions', decodedQuery],
         queryFn: () => QuizService.getQuestionsByQuery(decodedQuery),
         enabled: isAuthenticated,
         retry: 1,

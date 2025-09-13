@@ -12,6 +12,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import QuizSkeleton from "@/components/common/QuizSkeleton";
+import { useDispatch } from "react-redux";
+import { setSearchEnable } from "@/store/reducers/searchSlice";
 
 export default function QuizPage() {
     const params = useParams();
@@ -19,6 +21,7 @@ export default function QuizPage() {
     const router = useRouter();
     const uuid = params?.uuid;
     const queryClient = useQueryClient();
+    const dispatch = useDispatch();
     const [remainingTime, setRemainingTime] = useState<number>(0);
 
     // Get page from URL or default to 1
@@ -36,11 +39,13 @@ export default function QuizPage() {
             // Clear local data and redirect
             await ClientDBService.clearAllQuizzes();
             persistor.purge();
+            dispatch(setSearchEnable(true));
             router.push(`/result/${uuid}`);
         },
         onError: async () => {
             // Still clear data and redirect even on error
             await ClientDBService.clearAllQuizzes();
+            dispatch(setSearchEnable(false));
             router.push(`/result/${uuid}`);
         },
     });
@@ -51,6 +56,7 @@ export default function QuizPage() {
         queryFn: async () => {
             if (typeof uuid !== "string") throw new Error("Invalid UUID");
             await ClientDBService.clearAllQuizzes();
+            dispatch(setSearchEnable(false));
             const response = await QuizService.getQuizList(uuid);
             if (response.length > 0) {
                 const data = response.map(quiz => ({

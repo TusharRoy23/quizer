@@ -103,3 +103,15 @@ export interface QuestionKeyword {
     explanation?: string;
     example?: string;
 }
+export interface ErrorResponse {
+    status: number;
+    data: {
+        statusCode: number;
+        success: boolean;
+        message: string;
+        error: Record<string, string[]>;
+    };
+    meta: any;
+    message: string;
+    __isWrapped: boolean;
+}

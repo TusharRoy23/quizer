@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 
 const FloatingSearch = () => {
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const isSearchEnabled = useSelector((state: RootState) => state.search.isEnabled);
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
     const router = useRouter();
@@ -29,8 +30,8 @@ const FloatingSearch = () => {
         if (!trimmedText) return;
 
         // Basic validation - limit length
-        if (trimmedText.length > 100) {
-            alert('Search query too long (max 100 characters)');
+        if (trimmedText.length > 50) {
+            alert('Search query too long (max 50 characters)');
             return;
         }
 
@@ -56,7 +57,7 @@ const FloatingSearch = () => {
     }
 
     return (
-        isAuthenticated && <div className="fixed bottom-6 right-6 z-50">
+        isAuthenticated && isSearchEnabled && <div className="fixed bottom-6 right-6 z-50">
             {/* Search Box */}
             {isOpen && (
                 <div className="bg-white rounded-lg shadow-lg p-4 mb-4 w-80 animate-fade-in neon-border-glow">

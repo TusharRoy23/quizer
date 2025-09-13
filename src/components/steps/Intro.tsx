@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setSearchEnable } from "@/store/reducers/searchSlice";
 
 // Loading skeleton component
 const IntroSkeleton = () => {
@@ -26,6 +27,7 @@ const IntroSkeleton = () => {
 
 export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepProps) {
     const router = useRouter();
+    const dispatch = useDispatch();
     const isAuthLoading = useSelector((state: RootState) => state.auth.isLoading);
     const { data: onGoingQuiz, isError } = useQuery<QuizResult>({
         queryKey: ['latestOnGoingQuiz'],
@@ -40,6 +42,12 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
     const handleOngoingQuiz = () => {
         if (!onGoingQuiz?.uuid) return;
         router.push(`/quiz/${onGoingQuiz?.uuid}`);
+    }
+
+    if (onGoingQuiz?.uuid) {
+        dispatch(setSearchEnable(false));
+    } else {
+        dispatch(setSearchEnable(true));
     }
 
     // Show loading state while API is fetching

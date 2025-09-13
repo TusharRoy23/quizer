@@ -30,9 +30,7 @@ export function middleware(request: NextRequest) {
 
     // 3. Redirect to login if protected and no token
     if (isProtectedRoute && !token) {
-        const loginUrl = new URL('/', request.url)
-        loginUrl.searchParams.set('from', pathname) // optional: redirect back after login
-        return NextResponse.redirect(loginUrl)
+        return NextResponse.redirect(new URL('/', request.url));
     }
 
     return NextResponse.next()

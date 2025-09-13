@@ -2,58 +2,49 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Define protected routes
+// Define protected routes (base paths)
 const protectedRoutes = [
     '/quiz',
     '/result',
     '/generated',
-    '/search'
+    '/search',
 ]
 
-// Define public routes that don't require authentication
-// const publicRoutes = [
-//   '/'
-// ]
-
 export function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl
+    const { pathname, searchParams } = request.nextUrl
     const token = request.cookies.get('accessToken')?.value
 
-    // Check if the current route is protected
-    const isProtectedRoute = protectedRoutes.some(route =>
-        pathname.startsWith(route)
-    )
-
-    // Check if the current route is public
-    //   const isPublicRoute = publicRoutes.some(route => 
-    //     pathname.startsWith(route)
-    //   )
-
-    // Redirect to login if trying to access protected route without auth
-    if (isProtectedRoute && !token) {
-        const loginUrl = new URL('/', request.url)
-        // loginUrl.searchParams.set('from', pathname)
-        return NextResponse.redirect(loginUrl)
+    // 1. Skip Next.js internal RSC/data/prefetch requests
+    if (
+        searchParams.has('_rsc') ||                       // React Server Component requests
+        request.headers.has('next-router-prefetch') ||    // Prefetch requests
+        request.headers.has('rsc')                        // Some RSC streaming headers
+    ) {
+        return NextResponse.next()
     }
 
-    //   // Redirect to dashboard if trying to access public route while authenticated
-    //   if (isPublicRoute && token && !pathname.startsWith('/')) {
-    //     return NextResponse.redirect(new URL('/dashboard', request.url))
-    //   }
+    // 2. Check if route is protected
+    const isProtectedRoute = protectedRoutes.some(route =>
+        pathname === route || pathname.startsWith(`${route}/`)
+    )
+
+    // 3. Redirect to login if protected and no token
+    if (isProtectedRoute && !token) {
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('from', pathname) // optional: redirect back after login
+        return NextResponse.redirect(loginUrl)
+    }
 
     return NextResponse.next()
 }
 
-// Configure which routes the middleware will run on
+// Configure matcher
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - public folder
-         */
+        // Match everything except:
+        // - _next/static (static files)
+        // - _next/image (image optimization)
+        // - favicon and public assets
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }

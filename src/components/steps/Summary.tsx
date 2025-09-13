@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Table, TableBody, TableRow, TableCell } from "../ui/table";
 import { QuizRequest, StepProps, Topic } from "@/utils/types";
 import StepLayout from "../layouts/StepLayout";
@@ -8,6 +8,7 @@ import { ArrowRight } from "@/icons";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { QuizService } from "@/services/quizService";
+import { setSearchEnable } from "@/store/reducers/searchSlice";
 
 const SummaryData = () => {
     const selector = useSelector((state: RootState) => state.steps);
@@ -91,6 +92,7 @@ const SummaryData = () => {
 
 export default function Summary({ onPreviousStep }: StepProps) {
     const router = useRouter();
+    const dispatch = useDispatch();
     const selector = useSelector((state: RootState) => state.steps);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -105,6 +107,8 @@ export default function Summary({ onPreviousStep }: StepProps) {
             setIsGenerating(false);
             return;
         }
+
+        dispatch(setSearchEnable(false));
 
         try {
             const { department, topics, difficulty, questionCount, timer } = form;
@@ -125,6 +129,7 @@ export default function Summary({ onPreviousStep }: StepProps) {
                 setError(error.message);
             }
             setIsGenerating(false);
+            setSearchEnable(true);
         }
     };
 

@@ -37,7 +37,7 @@ export function middleware(request: NextRequest) {
     // Redirect to login if protected and no token
     if (isProtectedRoute && !token) {
         const loginUrl = new URL('/', process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000');
-        loginUrl.searchParams.set('redirect', pathname);
+        // loginUrl.searchParams.set('redirect', pathname);
         console.log('Middleware: Redirecting to', loginUrl.toString());
         return NextResponse.redirect(loginUrl);
     }

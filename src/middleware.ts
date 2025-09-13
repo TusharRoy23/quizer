@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Define protected routes (base paths)
 const protectedRoutes = [
     '/quiz',
     '/result',
@@ -10,39 +9,61 @@ const protectedRoutes = [
     '/search',
 ]
 
+// List of paths that should never be protected
+const publicPaths = [
+    '/',
+    // '/login',
+    // '/register',
+    // '/api/auth',
+    // '/api/public',
+]
+
 export function middleware(request: NextRequest) {
-    const { pathname, searchParams } = request.nextUrl
+    const { pathname } = request.nextUrl
     const token = request.cookies.get('accessToken')?.value
 
-    // 1. Skip Next.js internal RSC/data/prefetch requests
+    // Skip all internal Next.js requests and static files
     if (
-        searchParams.has('_rsc') ||                       // React Server Component requests
-        request.headers.has('next-router-prefetch') ||    // Prefetch requests
-        request.headers.has('rsc')                        // Some RSC streaming headers
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/_vercel') ||
+        pathname.startsWith('/api/_next') ||
+        pathname.match(/\.(ico|svg|png|jpg|jpeg|gif|webp|css|js|woff|woff2)$/) ||
+        request.headers.get('x-middleware-preflight') ||
+        request.headers.get('x-nextjs-data')
     ) {
         return NextResponse.next()
     }
 
-    // 2. Check if route is protected
+    // Skip public paths
+    const isPublicPath = publicPaths.some(path =>
+        pathname === path || pathname.startsWith(`${path}/`)
+    )
+
+    if (isPublicPath) {
+        return NextResponse.next()
+    }
+
+    // Check if route is protected
     const isProtectedRoute = protectedRoutes.some(route =>
         pathname === route || pathname.startsWith(`${route}/`)
     )
 
-    // 3. Redirect to login if protected and no token
+    // Redirect to login if protected and no token
     if (isProtectedRoute && !token) {
-        return NextResponse.redirect(new URL('/', request.url));
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(loginUrl)
     }
 
     return NextResponse.next()
 }
 
-// Configure matcher
+// Only run middleware on protected routes
 export const config = {
     matcher: [
-        // Match everything except:
-        // - _next/static (static files)
-        // - _next/image (image optimization)
-        // - favicon and public assets
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/quiz/:path*',
+        '/result/:path*',
+        '/generated/:path*',
+        '/search/:path*',
     ],
 }

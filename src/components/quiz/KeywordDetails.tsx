@@ -1,55 +1,30 @@
 import { QuizService } from "@/services/quizService";
 import { QuestionKeyword } from "@/utils/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
-import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useEffect, useRef, useState } from "react";
+import MarkdownRenderer from "../common/MarkdownRenderer";
 
 interface KeywordDetailsProps {
     keywordUuid: string;
     onClose: () => void;
 }
 
-interface CodeProps {
-    inline?: boolean;
-    className?: string;
-    children?: React.ReactNode;
-}
-
-const MarkdownRenderer = ({ content }: { content: string }) => (
-    <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-            code: (({ inline, className, children, ...props }: CodeProps) => {
-                const match = /language-(\w+)/.exec(className || "");
-                return !inline && match ? (
-                    <SyntaxHighlighter
-                        style={oneDark}
-                        language={match[1]}
-                        PreTag="div"
-                        {...props}
-                    >
-                        {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                ) : (
-                    <code className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4" {...props}>
-                        {children}
-                    </code>
-                );
-            }) as React.ComponentType<CodeProps>,
-        }}
-    >
-        {content}
-    </ReactMarkdown>
-);
-
 const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
-    const [example, setExample] = useState<string | null>(null);
-    const [isFetchingExample, setIsFetchingExample] = useState(false);
+    const queryClient = useQueryClient();
+
+    const [keywordExplanation, setKeywordExplanation] = useState("");
+    const [isKeywordStreaming, setIsKeywordStreaming] = useState(false);
+    const [isKeywordTyping, setIsKeywordTyping] = useState(false);
+    const [keywordStreamError, setKeywordStreamError] = useState<string | null>(null);
+    const keywordControllerRef = useRef<(() => void) | null>(null);
+
+    const [keywordExampleExplanation, setKeywordExampleExplanation] = useState("");
+    const [isKeywordExampleStreaming, setIsKeywordExampleStreaming] = useState(false);
+    const [isKeywordExampleTyping, setIsKeywordExampleTyping] = useState(false);
+    const [keywordExampleStreamError, setKeywordExampleStreamError] = useState<string | null>(null);
+    const keywordExampleControllerRef = useRef<(() => void) | null>(null);
 
     const { data: keywordDetails, isLoading, error } = useQuery<QuestionKeyword>({
         queryKey: ["keywordDetails", keywordUuid],
@@ -58,22 +33,118 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
         retry: 1
     });
 
+    const startStreaming = async () => {
+        setIsKeywordStreaming(true);
+        setKeywordExplanation("");
+        setKeywordStreamError(null);
+        setIsKeywordTyping(false);
+
+        try {
+            keywordControllerRef.current = await QuizService.getStreamedExplanation(
+                `keywords/stream/${keywordUuid}/`,
+                (completeText) => {
+                    // Received complete text
+                    setKeywordExplanation(completeText);
+                    setIsKeywordStreaming(false);
+                    queryClient.setQueryData<QuestionKeyword>(
+                        ["keywordDetails", keywordUuid],
+                        (oldData) => {
+                            if (oldData) {
+                                return {
+                                    ...oldData,
+                                    explanation: completeText,
+                                };
+                            }
+                            return oldData;
+                        }
+                    );
+                    setIsKeywordTyping(false);
+                },
+                (chunk) => {
+                    setKeywordExplanation(prev => prev + chunk);
+                    setIsKeywordStreaming(true);
+                    setIsKeywordTyping(true);
+                },
+                (error) => {
+                    console.error('Stream error:', error);
+                    setIsKeywordStreaming(false);
+                    setIsKeywordTyping(false);
+                    setKeywordStreamError('Failed to stream explanation');
+                }
+            );
+
+        } catch (error) {
+            console.error('Failed to start streaming:', error);
+            setIsKeywordStreaming(false);
+            setIsKeywordTyping(false);
+            setKeywordStreamError('Failed to start streaming');
+        }
+    };
+
+    const retryStreaming = () => {
+        if (keywordControllerRef.current) {
+            keywordControllerRef.current();
+            keywordControllerRef.current = null;
+        }
+        startStreaming();
+    };
+
+    useEffect(() => {
+        if (!keywordDetails?.explanation && !isKeywordStreaming && !isKeywordTyping && !isLoading) {
+            startStreaming();
+        }
+
+        // Cleanup function to abort streaming when component unmounts
+        return () => {
+            if (keywordControllerRef.current) {
+                keywordControllerRef.current();
+            }
+        };
+    }, [keywordDetails?.uuid, !keywordDetails?.explanation, !isLoading])
+
     const handleExampleClick = async () => {
         if (keywordDetails?.example) {
-            setExample(keywordDetails.example);
             return;
         }
 
-        if (isFetchingExample) return;
-
         try {
-            setIsFetchingExample(true);
-            const fetchedExample = await QuizService.getKeywordExample(keywordUuid);
-            setExample(fetchedExample);
+            setIsKeywordExampleStreaming(true);
+            setKeywordExampleExplanation("");
+            setKeywordExampleStreamError(null);
+            setIsKeywordExampleTyping(false);
+
+            keywordExampleControllerRef.current = await QuizService.getStreamedExplanation(
+                `keywords/stream/example/${keywordUuid}/`,
+                (completeText) => {
+                    // Received complete text
+                    setKeywordExampleExplanation(completeText);
+                    setIsKeywordExampleStreaming(false);
+                    queryClient.setQueryData<QuestionKeyword>(
+                        ["keywordDetails", keywordUuid],
+                        (oldData) => {
+                            if (oldData) {
+                                return {
+                                    ...oldData,
+                                    example: completeText,
+                                };
+                            }
+                            return oldData;
+                        }
+                    );
+                    setIsKeywordExampleTyping(false);
+                },
+                (chunk) => {
+                    setKeywordExampleExplanation(prev => prev + chunk);
+                    setIsKeywordExampleStreaming(true);
+                    setIsKeywordExampleTyping(true);
+                },
+                (error) => {
+                    setIsKeywordExampleStreaming(false);
+                    setIsKeywordExampleTyping(false);
+                    setKeywordExampleStreamError('Failed to stream explanation');
+                }
+            );
         } catch {
-            setExample("Could not load example at this time.");
-        } finally {
-            setIsFetchingExample(false);
         }
     };
 
@@ -94,6 +165,17 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                     Failed to load keyword details
                 </div>
             )}
+            {keywordStreamError && (
+                <div className="mb-2">
+                    <p className="text-red-500">{keywordStreamError}</p>
+                    <button
+                        onClick={retryStreaming}
+                        className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                    >
+                        Retry Streaming
+                    </button>
+                </div>
+            )}
 
             {keywordDetails && (
                 <div className="flex flex-col min-h-0">
@@ -102,30 +184,53 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                             {keywordDetails.keyword}
                         </h4>
 
-                        <span className="text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4">
+                        {isKeywordStreaming && !isKeywordTyping && (
+                            <div className="flex items-center">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                                <p>Generating explanation...</p>
+                            </div>
+                        )}
+
+                        <span className={`text-sm leading-6 text-gray-500 dark:text-gray-400 mb-4${isKeywordStreaming && !isKeywordTyping && !keywordDetails?.explanation ? " animate-pulse" : ""}`}>
                             {keywordDetails.explanation && <MarkdownRenderer content={keywordDetails.explanation} />}
+                            {!keywordDetails.explanation && keywordExplanation && (
+                                <MarkdownRenderer content={keywordExplanation} />
+                            )}
                         </span>
                     </div>
-
-                    <div className="px-6 py-3 flex-grow-0">
-                        {example ? (
-                            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg max-h-[200px] overflow-y-auto">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Example:</span>
-                                <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
-                                    <MarkdownRenderer content={example} />
-                                </span>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={handleExampleClick}
-                                disabled={isFetchingExample}
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                    {!isKeywordTyping && !isKeywordStreaming && (
+                        <div className="px-6 py-3 flex-grow-0">
+                            {
+                                keywordExampleStreamError && <p className="text-red-500">{keywordExampleStreamError}</p>
+                            }
+                            {(keywordDetails.example || keywordExampleExplanation)
+                                && !keywordExampleStreamError ? (
+                                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg max-h-[200px] overflow-y-auto">
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Example:</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                                        {keywordDetails.example && <MarkdownRenderer content={keywordDetails.example} />}
+                                        {!keywordDetails.example && keywordExampleExplanation && (
+                                            <MarkdownRenderer content={keywordExampleExplanation} />
+                                        )}
+                                    </span>
+                                </div>
+                            ) : isKeywordExampleStreaming && !isKeywordExampleTyping ? (
+                                <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                                    <p>Generating example...</p>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={handleExampleClick}
+                                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
                                 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
-                            >
-                                {isFetchingExample ? 'Loading...' : 'See Example'}
-                            </button>
-                        )}
-                    </div>
+                                >
+                                    {keywordExampleStreamError ? "Retry" : "See Example"}
+                                </button>
+                            )}
+                        </div>
+                    )}
+
 
                     <div className="p-6 pt-4 flex-shrink-0">
                         <div className="flex items-center justify-end w-full gap-3">
@@ -133,6 +238,10 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                                 size="sm"
                                 variant="outline"
                                 onClick={onClose}
+                                disabled={isKeywordTyping
+                                    || isKeywordStreaming
+                                    || isKeywordExampleStreaming
+                                    || isKeywordExampleTyping}
                             >
                                 Close
                             </Button>

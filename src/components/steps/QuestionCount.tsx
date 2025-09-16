@@ -8,11 +8,11 @@ import { setQuestionCount } from "@/store/reducers/stepSlice";
 
 export default function QuestionCount({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
-    const questionCount = useSelector((state: RootState) => state.steps.form.questionCount) || 10;
+    const questionCount = useSelector((state: RootState) => state.steps.form.questionCount) || 5;
     const questionCountArr: Array<ObjectType> = [
+        { name: "5", value: 5 },
         { name: "10", value: 10 },
-        { name: "20", value: 20 },
-        { name: "30", value: 30 },
+        { name: "15", value: 15 },
     ];
 
     const onSelect = (count: ObjectType) => {
@@ -28,13 +28,13 @@ export default function QuestionCount({ onNextStep = () => { }, onPreviousStep }
                         label=""
                         placeholder="--Select--"
                         options={questionCountArr}
-                        getOptionValue={(dept) => dept.value}
-                        getOptionLabel={(dept) => dept.name}
+                        getOptionValue={(question) => question.value}
+                        getOptionLabel={(question) => question.name}
                         onChange={onSelect}
                         value={questionCount}
                     />
                 }
-                btnLabel={"Set your Timer"}
+                btnLabel={"Next"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}

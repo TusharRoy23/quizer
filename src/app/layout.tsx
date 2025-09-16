@@ -5,11 +5,22 @@ import Header from "@/components/common/Header";
 import React from "react";
 import Providers from "@/store/Providers";
 import QueryProvider from "@/hooks/query-provider";
+import { Roboto } from 'next/font/google';
+import FloatingSearch from "@/components/common/FloatingSearch";
 
 export const metadata: Metadata = {
   title: "Quizer",
-  description: "Dummy",
+  description: "AI Powered Quiz Application",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
+
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 export default function RootLayout({
   children,
@@ -17,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={roboto.className}>
       <body>
         <Providers>
           <QueryProvider>
@@ -28,6 +39,7 @@ export default function RootLayout({
                 {children}
               </div>
             </div>
+            <FloatingSearch />
           </QueryProvider>
         </Providers>
       </body>

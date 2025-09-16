@@ -9,6 +9,7 @@ interface MultiSelectProps<T> {
     getOptionValue: (option: T) => string | number;
     getOptionLabel: (option: T) => string;
     placeholder?: string;
+    maxSelection?: number;
 }
 
 const MultiSelect = <T,>({
@@ -20,6 +21,7 @@ const MultiSelect = <T,>({
     getOptionValue,
     getOptionLabel,
     placeholder = "Select options",
+    maxSelection,
 }: MultiSelectProps<T>) => {
     const [selectedOptions, setSelectedOptions] = useState<T[]>(defaultSelected);
     const [isOpen, setIsOpen] = useState(false);
@@ -35,11 +37,23 @@ const MultiSelect = <T,>({
             (selected) => getOptionValue(selected) === optionValue
         );
 
-        const newSelectedOptions = isSelected
-            ? selectedOptions.filter(
+        let newSelectedOptions;
+
+        if (isSelected) {
+            // Remove the option if already selected
+            newSelectedOptions = selectedOptions.filter(
                 (selected) => getOptionValue(selected) !== optionValue
-            )
-            : [...selectedOptions, option];
+            );
+        } else {
+            // Check if max selection limit is reached
+            if (maxSelection && selectedOptions.length >= maxSelection) {
+                // Optional: Show a message or prevent selection
+                console.warn(`Maximum ${maxSelection} items can be selected`);
+                return;
+            }
+            // Add the new option
+            newSelectedOptions = [...selectedOptions, option];
+        }
 
         setSelectedOptions(newSelectedOptions);
         onChange?.(newSelectedOptions);
@@ -105,6 +119,13 @@ const MultiSelect = <T,>({
                                 </span>
                             )}
 
+                            {/* Selection limit indicator */}
+                            {maxSelection && (
+                                <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
+                                    {selectedOptions.length}/{maxSelection}
+                                </span>
+                            )}
+
                             {/* Always show the dropdown toggle */}
                             <div className="ml-auto pl-2">
                                 <button
@@ -146,17 +167,24 @@ const MultiSelect = <T,>({
                                     const isSelected = selectedOptions.some(
                                         (selected) => getOptionValue(selected) === value
                                     );
+                                    const isDisabled = maxSelection && selectedOptions.length >= maxSelection && !isSelected;
+
                                     return (
                                         <div
                                             key={String(value)}
                                             className={`px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${isSelected ? 'bg-primary-50 dark:bg-gray-800' : ''
-                                                }`}
-                                            onClick={() => handleSelect(option)}
+                                                } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            onClick={() => !isDisabled && handleSelect(option)}
                                         >
                                             <div className="flex items-center">
                                                 <span className="block truncate">
                                                     {getOptionLabel(option)}
                                                 </span>
+                                                {isDisabled && (
+                                                    <span className="ml-2 text-xs text-gray-500">
+                                                        (Max reached)
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     );

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { env } from "@/lib/env";
 import { ClientDBService } from "@/services/clientDBService";
+import { ErrorResponse } from "@/utils/types";
 
 const API_BASE_URL = `${env.apiUrl}/`;
 
@@ -33,7 +34,7 @@ const clearLocalStorageAndDB = () => {
 
 let refreshPromise: Promise<void> | null = null;
 
-const callRefreshToken = async () => {
+export const callRefreshToken = async () => {
     if (!refreshPromise) {
         refreshPromise = axios
             .get(`${API_BASE_URL}user/auth/refresh`, { withCredentials: true })
@@ -95,9 +96,10 @@ apiClient.interceptors.response.use(
                 // Handle forbidden access
                 clearLocalStorageAndDB();
             }
-
+            const validationErrMsg = extractAllErrors(serverError)?.length > 0 ? 'Validation Error' : undefined;
             // Create a new error with the server message
             const errorWithMessage = new Error(
+                validationErrMsg ||
                 serverError?.message ||
                 serverError?.data?.message ||
                 serverError || 'An error occurred'
@@ -107,4 +109,20 @@ apiClient.interceptors.response.use(
         }
         return Promise.reject(error);
     }
-)
+);
+
+function extractAllErrors(errorResponse: ErrorResponse): { key: string, value: string }[] {
+    const { error } = errorResponse.data;
+
+    if (!error || typeof error !== 'object') {
+        return [];
+    }
+
+    const allErrors: { key: string, value: string }[] = [];
+
+    Object.entries(error).forEach(([key, value]) => {
+        allErrors.push({ key: key, value: Array.isArray(value) ? value[0] : value });
+    });
+
+    return allErrors;
+}

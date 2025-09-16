@@ -39,9 +39,10 @@ export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepP
                         getOptionLabel={(topic: Topic) => topic.name}
                         onChange={onSelectTopics}
                         defaultSelected={selectedTopics}
+                        maxSelection={2}
                     />
                 }
-                btnLabel={"Set your Difficulty"}
+                btnLabel={"Next"}
                 endIcon={<ArrowRight />}
                 onPreviousStep={onPreviousStep}
                 onNextStep={onNextStep}

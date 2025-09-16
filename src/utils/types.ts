@@ -63,7 +63,7 @@ export interface QuizResult {
     difficulty: string;
     question_count: number;
     completed: boolean;
-    score: boolean;
+    score: number;
     total_answers: number;
     total_correct: number;
     created_at: string;
@@ -102,4 +102,16 @@ export interface QuestionKeyword {
     keyword: string;
     explanation?: string;
     example?: string;
+}
+export interface ErrorResponse {
+    status: number;
+    data: {
+        statusCode: number;
+        success: boolean;
+        message: string;
+        error: Record<string, string[]>;
+    };
+    meta: any;
+    message: string;
+    __isWrapped: boolean;
 }

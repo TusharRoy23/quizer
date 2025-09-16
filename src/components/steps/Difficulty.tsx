@@ -33,7 +33,7 @@ export default function DifficultyLevel({ onNextStep = () => { }, onPreviousStep
                         value={selectedDifficulty}
                     />
                 }
-                btnLabel={"Total Questions"}
+                btnLabel={"Next"}
                 onNextStep={onNextStep}
                 onPreviousStep={onPreviousStep}
                 endIcon={<ArrowRight />}

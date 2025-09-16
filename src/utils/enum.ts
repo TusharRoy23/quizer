@@ -8,3 +8,10 @@ export enum STEPS {
     Timer = 'timer',
     Start = 'start'
 }
+
+export enum LOADER_FOR {
+    DEFAULT = 'loading',
+    GenerateQuiz = 'generate_quiz',
+    QuizResult = 'quiz_result',
+    QuizReview = 'quiz_review'
+}

@@ -97,44 +97,29 @@ export default function Home() {
               <Summary onPreviousStep={() => stepHandler(STEPS.Timer)} />
             )}
 
-            {isAuthenticated && String(step) === STEPS.Intro && (
+            {isAuthenticated && String(step) === STEPS.Intro && hasParticipatedInQuiz && (
               <motion.div
-                key={'verbal-quizzes-button'}
+                key={'previous-quiz-buttons'}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="mt-6 space-y-3"
               >
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center">
                   <Button
-                    size="sm"
+                    size="md"
                     variant="outline"
-                    endIcon={<File />}
-                    onClick={() => router.push("/verbal")}
-                  >
-                    Verbal Quizzes
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Extra Quizzes Button for Intro */}
-            {isAuthenticated && hasParticipatedInQuiz && String(step) === STEPS.Intro && (
-              <motion.div
-                key={'extra-quizzes-button'}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 1 }}
-              >
-                <div className="flex justify-center mt-4">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    endIcon={<File />}
+                    className="border-2 border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/30 hover:animate-none w-full max-w-xs"
+                    endIcon={
+                      <div className="ml-2 flex items-center">
+                        <File className="w-4 h-4" />
+                        <span className="ml-1">📚</span>
+                      </div>
+                    }
                     onClick={() => router.push("/generated")}
                   >
-                    Previous Quizzes
+                    View Previous Quizzes
                   </Button>
                 </div>
               </motion.div>

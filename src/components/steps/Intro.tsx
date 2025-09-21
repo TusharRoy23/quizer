@@ -10,6 +10,8 @@ import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchEnable } from "@/store/reducers/searchSlice";
 import { useEffect } from "react";
+import Button from "../ui/button/Button";
+import { File } from "@/icons";
 
 // Loading skeleton component
 const IntroSkeleton = () => {
@@ -109,6 +111,33 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
                             </p>
                         </motion.div>
                     )}
+                    {
+                        isAuthenticated && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+                            >
+                                <div className="flex justify-center">
+                                    <Button
+                                        size="md"
+                                        variant="outline"
+                                        className="border-2 border-purple-500 text-purple-600 dark:text-purple-400 dark:border-purple-400 font-semibold hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:animate-none w-full max-w-xs"
+                                        endIcon={
+                                            <div className="ml-2 flex items-center">
+                                                <File className="w-4 h-4" />
+                                                <span className="ml-1">✨</span>
+                                            </div>
+                                        }
+                                        onClick={() => router.push("/verbal")}
+                                    >
+                                        Try Verbal Quiz
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        )
+                    }
                 </div>
             }
             btnLabel={

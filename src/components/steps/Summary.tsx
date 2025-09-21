@@ -111,9 +111,8 @@ export default function Summary({ onPreviousStep, isVerbal = false }: StepProps)
             setIsGenerating(false);
             return;
         }
-        if (!isVerbal) {
-            dispatch(setSearchEnable(false));
-        }
+
+        dispatch(setSearchEnable(false));
 
         try {
             const { department, topics, difficulty } = form;

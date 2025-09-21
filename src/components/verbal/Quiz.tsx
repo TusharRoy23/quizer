@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { QuizService } from "@/services/quizService";
 import TypewriterRenderer from "../common/TypewriterRenderer";
 import { useRouter } from "next/navigation";
+import { setSearchEnable } from "@/store/reducers/searchSlice";
+import { useDispatch } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Quiz({
     quiz,
@@ -18,6 +21,7 @@ export default function Quiz({
     isFirstQuestion?: boolean;
 }) {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
@@ -92,6 +96,7 @@ export default function Quiz({
         try {
             const response = await QuizService.submitVerbalQuiz(logUUID);
             if (response) {
+                dispatch(setSearchEnable(true));
                 router.push(`/verbal/${logUUID}/feedback`);
             }
         } catch {
@@ -302,14 +307,23 @@ export default function Quiz({
                     🎵 Playing question audio...
                 </div>
             )}
-
-            {/* Question text */}
-            {showQuestionText && quiz?.question && (
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p className="text-lg text-gray-800 font-medium mb-2">Question:</p>
-                    <TypewriterRenderer text={quiz.question} speed={5} />
-                </div>
-            )}
+            <AnimatePresence mode="wait">
+                {showQuestionText && quiz?.question && (
+                    <motion.div
+                        key={quiz.uuid} // ensure fresh animation on each question
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                    >
+                        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                            <p className="text-lg text-gray-800 font-medium mb-2">Question:</p>
+                            <TypewriterRenderer text={quiz.question} speed={5} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* User Interaction Button (First Question) */}
             {isFirstQuestion && !userInteracted && !isLoading && (
@@ -332,16 +346,6 @@ export default function Quiz({
                     <p className="text-red-700 font-semibold mb-2 text-center">
                         ● Recording... {formatTime(timeLeft)}
                     </p>
-                    <div className="w-full bg-red-100 rounded-full h-3">
-                        {quiz.oral_timer && (
-                            <div
-                                className="bg-red-500 h-3 rounded-full transition-all duration-1000"
-                                style={{
-                                    width: `${(timeLeft / (quiz.oral_timer * 60)) * 100}%`,
-                                }}
-                            />
-                        )}
-                    </div>
                 </div>
             )}
 

@@ -5,6 +5,7 @@ import { OralQuestion } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function VerbalQuiz() {
     const params = useParams();
@@ -73,14 +74,15 @@ export default function VerbalQuiz() {
                         />
                     </div>
                 </div>
-
-                <Quiz
-                    quiz={quiz}
-                    logUUID={uuid}
-                    onNextQuestion={() => handlePageChange(currentPage + 1)}
-                    isLastQuestion={isLastQuestion}
-                    isFirstQuestion={currentPage == 1}
-                />
+                <motion.div layout className="p-6 bg-white rounded-lg shadow-lg max-w-2xl mx-auto">
+                    <Quiz
+                        quiz={quiz}
+                        logUUID={uuid}
+                        onNextQuestion={() => handlePageChange(currentPage + 1)}
+                        isLastQuestion={isLastQuestion}
+                        isFirstQuestion={currentPage == 1}
+                    />
+                </motion.div>
             </div>
         </div>
     );

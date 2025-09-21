@@ -14,26 +14,13 @@ export default function Verbal() {
     const logsRef = useRef<HTMLDivElement>(null);
     const createRef = useRef<HTMLDivElement>(null);
 
-    // Calculate the maximum height needed for both tabs
     useEffect(() => {
-        const calculateMaxHeight = () => {
-            const logsHeight = logsRef.current?.scrollHeight || 0;
-            const createHeight = createRef.current?.scrollHeight || 0;
-            const maxHeight = Math.max(logsHeight, createHeight, 400); // Minimum 400px
-            setContentHeight(maxHeight);
-        };
+        const logsHeight = logsRef.current?.scrollHeight || 0;
+        const createHeight = createRef.current?.scrollHeight || 0;
+        const maxHeight = Math.max(logsHeight, createHeight, 400);
+        setContentHeight(maxHeight);
+    }, []); // ← run once only
 
-        // Calculate after a small delay to allow rendering
-        const timer = setTimeout(calculateMaxHeight, 100);
-
-        // Also calculate on window resize
-        window.addEventListener('resize', calculateMaxHeight);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('resize', calculateMaxHeight);
-        };
-    }, [activeTab]);
 
     return (
         <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -66,19 +53,14 @@ export default function Verbal() {
                 className="px-6 pb-6 transition-all duration-300 ease-in-out"
                 style={{ minHeight: `${contentHeight}px` }}
             >
-                <div
-                    ref={logsRef}
-                    className={activeTab === 'logs' ? 'block' : 'hidden'}
-                >
+                <div ref={logsRef} className={activeTab === 'logs' ? 'block' : 'hidden'}>
                     <VerbalLogs />
                 </div>
-                <div
-                    ref={createRef}
-                    className={activeTab === 'create' ? 'block' : 'hidden'}
-                >
+                <div ref={createRef} className={activeTab === 'create' ? 'block' : 'hidden'}>
                     <CreateQuiz />
                 </div>
             </div>
+
         </div>
     );
 }

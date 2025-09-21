@@ -42,7 +42,6 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-
       <main className="relative z-10 flex flex-col gap-6 items-center sm:items-start w-full max-w-3xl">
         {/* Step Card with Animation */}
         <AnimatePresence mode="wait">
@@ -96,6 +95,27 @@ export default function Home() {
             )}
             {String(step) === STEPS.Start && (
               <Summary onPreviousStep={() => stepHandler(STEPS.Timer)} />
+            )}
+
+            {isAuthenticated && String(step) === STEPS.Intro && (
+              <motion.div
+                key={'verbal-quizzes-button'}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 1 }}
+              >
+                <div className="flex justify-center mt-4">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    endIcon={<File />}
+                    onClick={() => router.push("/verbal")}
+                  >
+                    Verbal Quizzes
+                  </Button>
+                </div>
+              </motion.div>
             )}
 
             {/* Extra Quizzes Button for Intro */}

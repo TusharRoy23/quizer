@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchEnable } from "@/store/reducers/searchSlice";
+import { useEffect } from "react";
 
 // Loading skeleton component
 const IntroSkeleton = () => {
@@ -41,14 +42,13 @@ export default function Intro({ onNextStep = () => { }, isAuthenticated }: StepP
 
     const handleOngoingQuiz = () => {
         if (!onGoingQuiz?.uuid) return;
-        router.push(`/quiz/${onGoingQuiz?.uuid}`);
+        const url = onGoingQuiz.is_oral ? 'verbal' : 'quiz';
+        router.push(`/${url}/${onGoingQuiz?.uuid}`);
     }
 
-    if (onGoingQuiz?.uuid) {
-        dispatch(setSearchEnable(false));
-    } else {
-        dispatch(setSearchEnable(true));
-    }
+    useEffect(() => {
+        dispatch(setSearchEnable(!onGoingQuiz?.uuid));
+    }, [dispatch, onGoingQuiz?.uuid]);
 
     // Show loading state while API is fetching
     if (isAuthLoading) {

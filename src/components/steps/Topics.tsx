@@ -5,13 +5,14 @@ import { fetchTopics } from "@/services/topicService";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import MultiSelect from "../form/MultiSelectInput";
-import { selectTopics } from "@/store/reducers/stepSlice";
+import { setTopics } from "@/store/reducers/stepSlice";
+import { setTopics as setVerbalTopics } from "@/store/reducers/verbalStepSlice";
 import { useQuery } from "@tanstack/react-query";
 
-export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepProps) {
+export default function Topics({ onNextStep = () => { }, onPreviousStep, isVerbal = false }: StepProps) {
     const dispatch = useDispatch();
-    const selectedTopics = useSelector((state: RootState) => state.steps.form.topics) || [];
-    const selectedDepartment = useSelector((state: RootState) => state.steps.form.department);
+    const selectedTopics = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps'].form.topics) || [];
+    const selectedDepartment = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps'].form.department);
 
     const { data: topics = [] } = useQuery<Topic[]>({
         queryKey: ["topics", selectedDepartment],
@@ -25,7 +26,7 @@ export default function Topics({ onNextStep = () => { }, onPreviousStep }: StepP
     });
 
     const onSelectTopics = (topics: Topic[]) => {
-        dispatch(selectTopics(topics));
+        dispatch(isVerbal ? setVerbalTopics(topics) : setTopics(topics));
     }
     return (
         <>

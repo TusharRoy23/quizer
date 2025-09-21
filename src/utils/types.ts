@@ -7,6 +7,7 @@ export interface StepProps {
     onNextStep?: () => void,
     onPreviousStep?: () => void,
     isAuthenticated?: boolean;
+    isVerbal?: boolean;
 }
 
 export interface Department {
@@ -52,8 +53,8 @@ export interface QuizRequest {
     department: string | undefined;
     topics: string[];
     difficulty: string | undefined;
-    question_count: number | undefined;
-    timer: number;
+    question_count?: number | undefined;
+    timer?: number;
 }
 
 export interface QuizResult {
@@ -66,6 +67,7 @@ export interface QuizResult {
     score: number;
     total_answers: number;
     total_correct: number;
+    is_oral: boolean;
     created_at: string;
 }
 
@@ -114,4 +116,32 @@ export interface ErrorResponse {
     meta: any;
     message: string;
     __isWrapped: boolean;
+}
+
+export type OralQuestion = {
+    uuid: string;
+    question: string;
+    oral_timer?: number; // Timer in minutes
+    oral_end_time?: Date; // End time in UTC
+    oral_response?: string;
+    topic?: string;
+    sub_topic?: string;
+    expected_points?: string[];
+}
+
+export type TAB = 'logs' | 'create';
+
+export interface IForm {
+    department: Department | undefined;
+    topics: Topic[];
+    difficulty: Difficulty | undefined;
+    questionCount?: ObjectType;
+    timer?: number
+}
+
+export interface IStep {
+    step: string,
+    form: IForm,
+    departmentList: Department[],
+    topicList: Topic[],
 }

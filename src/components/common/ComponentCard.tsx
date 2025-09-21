@@ -2,7 +2,7 @@ import React from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 
 interface ComponentCardProps {
-    title: string;
+    title?: string;
     children: React.ReactNode;
     className?: string; // Additional custom classes for styling
     desc?: string; // Description text,
@@ -21,7 +21,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ${className} w-full max-w-full`}
         >
             {/* Card Header */}
-            <div className="px-4 py-4 sm:px-6 sm:py-5 max-w-full overflow-hidden">
+            {title && <div className="px-4 py-4 sm:px-6 sm:py-5 max-w-full overflow-hidden">
                 <h3 className="text-base font-medium text-gray-800 dark:text-white/90 break-words max-w-full">
                     {!hasCode && title}
                     {
@@ -37,7 +37,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
                         {desc}
                     </p>
                 )}
-            </div>
+            </div>}
+
 
             {/* Card Body */}
             <div className="p-3 border-t border-gray-100 dark:border-gray-800 sm:p-6 w-full overflow-hidden">

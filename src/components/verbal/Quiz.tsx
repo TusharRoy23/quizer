@@ -242,6 +242,23 @@ export default function Quiz({
         onNextQuestion();
     };
 
+    const completeQuiz = async () => {
+        try {
+            stopEverything();
+            setIsSubmitting(true);
+            setShowQuestionText(false);
+
+            if (logUUID) {
+                await submitQuiz(logUUID);
+            }
+        } catch {
+            setIsSubmitting(false);
+        } finally {
+            setIsSubmitting(false);
+        }
+
+    }
+
     // Load audio when question changes
     useEffect(() => {
         if (quiz) {
@@ -350,15 +367,24 @@ export default function Quiz({
             )}
 
             {/* Next Button */}
-            {showNextButton && (
+            {showNextButton && !isLastQuestion && (
                 <button
                     onClick={handleNext}
                     className="w-full px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
                     disabled={isPlaying || isLoading || isSubmitting}
                 >
-                    {isLastQuestion ? "Complete Quiz" : "Next Question →"}
+                    Next Question →
                 </button>
             )}
+
+            {showNextButton && <button
+                onClick={completeQuiz}
+                className="w-full mt-3 px-6 py-3 border-2 border-purple-500 text-purple-600 dark:text-purple-400 dark:border-purple-400 rounded-lg hover:bg-purple-50"
+                disabled={isPlaying || isLoading || isSubmitting}
+            >
+                Complete Quiz
+            </button>}
+
         </div>
     );
 }

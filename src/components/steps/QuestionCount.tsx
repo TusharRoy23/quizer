@@ -8,7 +8,7 @@ import { setQuestionCount } from "@/store/reducers/stepSlice";
 
 export default function QuestionCount({ onNextStep = () => { }, onPreviousStep }: StepProps) {
     const dispatch = useDispatch();
-    const questionCount = useSelector((state: RootState) => state.steps.form.questionCount) || 5;
+    const questionCount = useSelector((state: RootState) => state.steps.form.questionCount) || { name: "5", value: 5 };
     const questionCountArr: Array<ObjectType> = [
         { name: "5", value: 5 },
         { name: "10", value: 10 },

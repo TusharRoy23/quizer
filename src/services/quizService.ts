@@ -1,5 +1,5 @@
 import { apiClient, callRefreshToken, isAccessTokenExpiringSoon } from "@/hooks/baseApi";
-import { PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
+import { OralQuestion, PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
 import { CommonService } from "./commonService"
 import { env } from "@/lib/env";
 
@@ -32,14 +32,14 @@ export const QuizService = {
         return response.data;
     },
     getQuizLogList: async ({ page, limit }: { page: number, limit: number } = { page: 1, limit: 10 }): Promise<PaginatedResponse<QuizResult>> => {
-        return CommonService.createPaginationFetcher<QuizResult>()('question/logs', page, limit);
+        return CommonService.createPaginationFetcher<QuizResult>()('question/logs/', page, limit);
     },
     getQuizLogs: async (logUuid: string): Promise<Quiz[]> => {
-        const response = await apiClient.get<Quiz[]>(`question/logs/${logUuid}`);
+        const response = await apiClient.get<Quiz[]>(`question/logs/${logUuid}/`);
         return response.data;
     },
     getQuizTimer: async (logUuid: string): Promise<QuizTimer> => {
-        const response = await apiClient.get<QuizTimer>(`question/quiz/${logUuid}/timer`);
+        const response = await apiClient.get<QuizTimer>(`question/quiz/${logUuid}/timer/`);
         return response.data;
     },
     getQuestionKeywordsByUuid: async (uuid: string): Promise<QuestionKeyword[]> => {
@@ -63,7 +63,7 @@ export const QuizService = {
         return response.data;
     },
     getQuestionsByQuery: async (query: string): Promise<Quiz[]> => {
-        const response = await apiClient.post<Quiz[]>('question/list/search', { query });
+        const response = await apiClient.post<Quiz[]>('question/list/search/', { query });
         return response.data;
     },
     getExplanationForQuestion: async (questionUuid: string): Promise<string> => {
@@ -128,5 +128,40 @@ export const QuizService = {
             onError(error as Error);
             return () => { };
         }
+    },
+    generateVerbalQuiz: async (payload: QuizRequest) => {
+        const response = await apiClient.post<string>('question/verbal/generate/', payload);
+        return response.data;
+    },
+    getVerbalQuestions: async (uuid: string) => {
+        const response = await apiClient.get<OralQuestion[]>(`question/verbal/quiz/${uuid}/`);
+        return response.data;
+    },
+    uploadAudioAnswer: async (questionUuid: string, formData: FormData): Promise<{ message: string }> => {
+        const response = await apiClient.post<{ message: string }>(`question/verbal/quiz/${questionUuid}/answer/`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
+    getVerbalQuizAudio: async (questionUUID: string): Promise<{ url: string }> => {
+        const response = await apiClient.get<{ url: string }>(`question/verbal/quiz/${questionUUID}/audio/`);
+        return response.data;
+    },
+    getVerbalQuizTimer: async (questionUUID: string): Promise<QuizTimer> => {
+        const response = await apiClient.get<QuizTimer>(`question/verbal/quiz/${questionUUID}/timer/`);
+        return response.data;
+    },
+    submitVerbalQuiz: async (logUuid: string): Promise<string> => {
+        const response = await apiClient.post<string>(`question/verbal/quiz/${logUuid}/submit/`);
+        return response.data;
+    },
+    getVerbalQuizLogs: async ({ page, limit }: { page: number, limit: number } = { page: 1, limit: 10 }): Promise<PaginatedResponse<QuizResult>> => {
+        return CommonService.createPaginationFetcher<QuizResult>()('question/verbal/logs/', page, limit);
+    },
+    getVervalQuestionFeedback: async (logUUID: string): Promise<OralQuestion[]> => {
+        const response = await apiClient.get<OralQuestion[]>(`question/verbal/quiz/${logUUID}/feedback/`);
+        return response.data;
     }
 };

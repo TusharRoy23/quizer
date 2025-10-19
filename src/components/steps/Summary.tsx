@@ -10,8 +10,8 @@ import { RootState } from "@/store";
 import { QuizService } from "@/services/quizService";
 import { setSearchEnable } from "@/store/reducers/searchSlice";
 
-const SummaryData = () => {
-    const selector = useSelector((state: RootState) => state.steps);
+const SummaryData = ({ isVerbal = false }: { isVerbal?: boolean }) => {
+    const selector = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps']);
     const { department, topics, difficulty, questionCount, timer } = selector.form;
 
     return (
@@ -57,30 +57,34 @@ const SummaryData = () => {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                            <TableRow>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                        Total Questions
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-5 py-4 text-start">
-                                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {questionCount?.name}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                        Timer
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-5 py-4 text-start">
-                                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {timer} minutes
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                            {!isVerbal &&
+                                <TableRow>
+                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                            Total Questions
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="px-5 py-4 text-start">
+                                        <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            {questionCount?.name}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            }
+                            {!isVerbal &&
+                                <TableRow>
+                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                            Timer
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="px-5 py-4 text-start">
+                                        <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            {timer} minutes
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            }
                         </TableBody>
                     </Table>
                     {/* </div> */}
@@ -90,10 +94,10 @@ const SummaryData = () => {
     );
 };
 
-export default function Summary({ onPreviousStep }: StepProps) {
+export default function Summary({ onPreviousStep, isVerbal = false }: StepProps) {
     const router = useRouter();
     const dispatch = useDispatch();
-    const selector = useSelector((state: RootState) => state.steps);
+    const selector = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps']);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -102,7 +106,7 @@ export default function Summary({ onPreviousStep }: StepProps) {
         setIsGenerating(true);
         setError(null);
 
-        if (!form.department || !form.topics || !form.difficulty || !form.questionCount) {
+        if (!form.department || !form.topics || !form.difficulty) {
             console.error("Please fill all the required fields before generating the quiz.");
             setIsGenerating(false);
             return;
@@ -111,18 +115,21 @@ export default function Summary({ onPreviousStep }: StepProps) {
         dispatch(setSearchEnable(false));
 
         try {
-            const { department, topics, difficulty, questionCount, timer } = form;
+            const { department, topics, difficulty } = form;
             const payload: QuizRequest = {
                 department: department?.uuid,
                 topics: topics?.map((topic: Topic) => topic.uuid),
                 difficulty: difficulty?.value,
-                question_count: +questionCount?.value,
-                timer: timer,
             };
-            const quizUuid = await QuizService.generateQuiz(payload);
+            if (!isVerbal) {
+                payload['question_count'] = form?.questionCount ? +form?.questionCount?.value : 5;
+                payload['timer'] = form.timer;
+            }
+            const quizUuid = isVerbal ? await QuizService.generateVerbalQuiz(payload) : await QuizService.generateQuiz(payload);
 
             if (quizUuid) {
-                router.push(`/quiz/${quizUuid}`);
+                const url = isVerbal ? `verbal` : `quiz`;
+                router.push(`/${url}/${quizUuid}`);
             }
         } catch (error) {
             if (error instanceof Error) {
@@ -137,7 +144,7 @@ export default function Summary({ onPreviousStep }: StepProps) {
         <div className="relative">
             <StepLayout
                 title="Summary"
-                description={<SummaryData />}
+                description={<SummaryData isVerbal={isVerbal} />}
                 btnLabel={isGenerating ? "Starting..." : "Let's Start"}
                 onNextStep={generateQuiz}
                 onPreviousStep={onPreviousStep}

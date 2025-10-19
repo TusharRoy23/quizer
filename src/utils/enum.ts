@@ -9,6 +9,13 @@ export enum STEPS {
     Start = 'start'
 }
 
+export enum VERBAL_STEPS {
+    Department = 'department',
+    Topics = 'topics',
+    Difficulty = 'difficulty',
+    Start = 'start'
+}
+
 export enum LOADER_FOR {
     DEFAULT = 'loading',
     GenerateQuiz = 'generate_quiz',

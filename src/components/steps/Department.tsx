@@ -4,11 +4,15 @@ import { ArrowRight } from "@/icons";
 import SelectInput from "../form/SelectInput";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { selectDepartment, selectTopics } from "@/store/reducers/stepSlice";
+import { setDepartment, setTopics } from "@/store/reducers/stepSlice";
+import {
+    setDepartment as setVerbalDepartment,
+    setTopics as setVerbalTopics
+} from "@/store/reducers/verbalStepSlice";
 import { fetchDepartments } from "@/services/departmentService";
 import { useQuery } from "@tanstack/react-query";
 
-export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep }: StepProps) {
+export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep, isVerbal = false }: StepProps) {
     const dispatch = useDispatch();
 
     const { data: departmentList = [] } = useQuery<Department[]>({
@@ -17,11 +21,10 @@ export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep 
         retry: 1,
     });
 
-    const department = useSelector((state: RootState) => state.steps.form.department);
-
+    const department = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps'].form.department);
     const onSelectDept = (dept: Department) => {
-        dispatch(selectDepartment(dept));
-        dispatch(selectTopics([]));
+        dispatch(isVerbal ? setVerbalDepartment(dept) : setDepartment(dept));
+        dispatch(isVerbal ? setVerbalTopics([]) : setTopics([]));
     }
 
     return (

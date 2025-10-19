@@ -3,14 +3,18 @@ import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
 import { ArrowRight, Grid, Calendar, Clock, Trophy, CheckCircle2, QuestionMark } from "@/icons";
 import { QuizService } from "@/services/quizService";
+import { setStep } from "@/store/reducers/stepSlice";
+import { STEPS } from "@/utils/enum";
 import { PaginatedResponse, QuizResult } from "@/utils/types";
 import { QueryFunctionContext, useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
 const LIMIT = 12; // Increased to be divisible by 3
 
 export default function GeneratedPage() {
     const router = useRouter();
+    const dispatch = useDispatch();
     const {
         data,
         isError,
@@ -66,10 +70,10 @@ export default function GeneratedPage() {
         <div className="rounded-2xl border border-gray-200 bg-white px-4 py-6 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:py-8 lg:px-8 lg:py-10">
             <div className="w-full max-w-[630px] text-center mx-auto mb-8">
                 <h3 className="mb-2 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-                    Quiz History
+                    {!isLoading && allLogs.length === 0 ? 'No Quizzes Yet' : 'Quiz History'}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                    Review your past quiz attempts and track your progress
+                    {!isLoading && allLogs.length === 0 ? 'Start your first quiz to see your history here!' : 'Review your past quiz attempts and track your progress'}
                 </p>
             </div>
 
@@ -333,6 +337,22 @@ export default function GeneratedPage() {
                     </div>
                 )}
             </div>
+
+            {/* Empty State */}
+            {!isLoading && allLogs.length === 0 && (
+                <div className="text-center py-12">
+                    <Button
+                        onClick={() => {
+                            dispatch(setStep(STEPS.Department));
+                            router.push('/');
+                        }}
+                        variant="primary"
+                        size="md"
+                    >
+                        Start Your First Quiz
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }

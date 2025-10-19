@@ -1,32 +1,10 @@
-import { Department, Difficulty, ObjectType, Topic } from "@/utils/types";
+import { Department, Difficulty, IStep, ObjectType, Topic } from "@/utils/types";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-interface UserInfo {
-    name: string;
-    email: string;
-}
-
-interface IForm {
-    userInfo: UserInfo | undefined;
-    department: Department | undefined;
-    topics: Topic[];
-    difficulty: Difficulty | undefined;
-    questionCount: ObjectType;
-    timer: number
-}
-
-interface IStep {
-    step: string,
-    form: IForm,
-    departmentList: Department[],
-    topicList: Topic[],
-}
 
 const initialState: IStep = {
     step: 'intro',
     form: {
-        userInfo: undefined,
         department: undefined,
         topics: [],
         difficulty: undefined,
@@ -44,16 +22,13 @@ export const stepsSlice = createSlice({
         setStep(state, action: PayloadAction<string>) {
             state.step = action.payload;
         },
-        setUserInfo(state, action: PayloadAction<UserInfo>) {
-            state.form.userInfo = action.payload;
-        },
-        selectDepartment(state, action: PayloadAction<Department>) {
+        setDepartment(state, action: PayloadAction<Department>) {
             state.form.department = action.payload;
         },
         setDepartmentList(state, action: PayloadAction<Department[]>) {
             state.departmentList = action.payload;
         },
-        selectTopics(state, action: PayloadAction<Topic[]>) {
+        setTopics(state, action: PayloadAction<Topic[]>) {
             state.form.topics = action.payload;
         },
         setTopicList(state, action: PayloadAction<Topic[]>) {
@@ -73,10 +48,9 @@ export const stepsSlice = createSlice({
 
 export const {
     setStep,
-    setUserInfo,
-    selectDepartment,
+    setDepartment,
     setDepartmentList,
-    selectTopics,
+    setTopics,
     setTopicList,
     setDifficulty,
     setQuestionCount,

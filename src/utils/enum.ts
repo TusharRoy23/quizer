@@ -22,3 +22,9 @@ export enum LOADER_FOR {
     QuizResult = 'quiz_result',
     QuizReview = 'quiz_review'
 }
+
+export enum AgenticRole {
+    USER = 'USER',
+    ASSISTANT = 'ASSISTANT',
+    SYSTEM = 'SYSTEM'
+}

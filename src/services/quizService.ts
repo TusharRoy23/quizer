@@ -1,5 +1,5 @@
 import { apiClient, callRefreshToken, isAccessTokenExpiringSoon } from "@/hooks/baseApi";
-import { OralQuestion, PaginatedResponse, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
+import { OralQuestion, PaginatedResponse, QuestionDiscussionMessage, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
 import { CommonService } from "./commonService"
 import { env } from "@/lib/env";
 
@@ -163,5 +163,73 @@ export const QuizService = {
     getVervalQuestionFeedback: async (logUUID: string): Promise<OralQuestion[]> => {
         const response = await apiClient.get<OralQuestion[]>(`question/verbal/quiz/${logUUID}/feedback/`);
         return response.data;
+    },
+    getQuestionDiscussions: async (questionUUID: string): Promise<QuestionDiscussionMessage[]> => {
+        const response = await apiClient.get<QuestionDiscussionMessage[]>(`question/discussion/messages/${questionUUID}/`);
+        return response.data;
+    },
+    getStreamedDiscussionResponse: async (
+        questionUUID: string,
+        payload: { question: string },
+        onComplete: (fullText: string) => void,
+        onChunk: (chunk: string) => void,
+        onError: (error: Error) => void
+    ): Promise<() => void> => {
+        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+        try {
+            // Ensure we have a valid token before making the request
+            await ensureValidToken();
+            const response = await fetch(`${env.apiUrl}/question/explanation/agent/${questionUUID}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
+            }
+
+            if (!response.body) {
+                throw new Error('Response body is null');
+            }
+
+            reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            const processStream = async () => {
+                try {
+                    while (true) {
+                        const { done, value } = await reader!.read();
+
+                        if (done) {
+                            onComplete(fullText); // Send complete text at once
+                            break;
+                        }
+
+                        const textChunk = decoder.decode(value, { stream: true });
+                        fullText += textChunk;
+                        onChunk(textChunk);
+                    }
+                } catch (error) {
+                    onError(error as Error);
+                } finally {
+                    reader!.releaseLock();
+                }
+            };
+
+            processStream();
+
+            return () => {
+                reader!.cancel().catch(() => { });
+            };
+
+        } catch (error) {
+            onError(error as Error);
+            return () => { };
+        }
     }
 };

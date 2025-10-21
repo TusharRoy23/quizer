@@ -15,7 +15,7 @@ export default function VerbalQuiz() {
     const uuid = params?.uuid as string || "";
     const [currentPage, setCurrentPage] = useState(pageParam ? Math.max(1, parseInt(pageParam)) : 1);
 
-    const { data: quizList = [], isLoading, error, isError } = useQuery<OralQuestion[]>({
+    const { data: quizList = [], isLoading, isError } = useQuery<OralQuestion[]>({
         queryKey: ["quizLogs", uuid],
         queryFn: () => QuizService.getVerbalQuestions(uuid),
         enabled: !!uuid,

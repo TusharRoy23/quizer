@@ -59,14 +59,14 @@ export default function Question({ quiz, onSelect, canSelect, onReturn }: Questi
                     setIsStreaming(true);
                     setIsTyping(true);
                 },
-                (error) => {
+                () => {
                     setIsStreaming(false);
                     setIsTyping(false);
                     setStreamError('Failed to stream explanation');
                 }
             );
 
-        } catch (error) {
+        } catch {
             setIsStreaming(false);
             setIsTyping(false);
             setStreamError('Failed to start streaming');
@@ -184,7 +184,7 @@ export default function Question({ quiz, onSelect, canSelect, onReturn }: Questi
                                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
                             >
                                 <span>💬</span>
-                                <span>Let's Discuss</span>
+                                <span>{"Let's Discuss"}</span>
                             </button>
                         </div>
                     }

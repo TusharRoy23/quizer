@@ -138,7 +138,7 @@ const KeywordDetails = ({ keywordUuid, onClose }: KeywordDetailsProps) => {
                     setIsKeywordExampleStreaming(true);
                     setIsKeywordExampleTyping(true);
                 },
-                (error) => {
+                () => {
                     setIsKeywordExampleStreaming(false);
                     setIsKeywordExampleTyping(false);
                     setKeywordExampleStreamError('Failed to stream explanation');

@@ -22,7 +22,7 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const queryClient = useQueryClient();
 
-    const { data: messages = [], isLoading, error, isError } = useQuery<QuestionDiscussionMessage[]>({
+    const { data: messages = [], isLoading } = useQuery<QuestionDiscussionMessage[]>({
         queryKey: ["discussionLogs", quiz.uuid],
         queryFn: () => QuizService.getQuestionDiscussions(quiz.uuid),
         enabled: !!quiz.uuid,

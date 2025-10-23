@@ -71,20 +71,14 @@ export default function Home() {
             )}
             {String(step) === STEPS.Topics && (
               <Topics
-                onNextStep={() => stepHandler(STEPS.Difficulty)}
+                onNextStep={() => stepHandler(STEPS.Timer)}
                 onPreviousStep={() => stepHandler(STEPS.Department)}
-              />
-            )}
-            {String(step) === STEPS.Difficulty && (
-              <Difficulty
-                onNextStep={() => stepHandler(STEPS.QuestionCount)}
-                onPreviousStep={() => stepHandler(STEPS.Topics)}
               />
             )}
             {String(step) === STEPS.QuestionCount && (
               <QuestionCount
                 onNextStep={() => stepHandler(STEPS.Timer)}
-                onPreviousStep={() => stepHandler(STEPS.Difficulty)}
+                onPreviousStep={() => stepHandler(STEPS.Department)}
               />
             )}
             {String(step) === STEPS.Timer && (

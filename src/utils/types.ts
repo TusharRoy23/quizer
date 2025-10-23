@@ -54,7 +54,7 @@ export interface UserInfo {
 export interface QuizRequest {
     department: string | undefined;
     topics: string[];
-    difficulty: string | undefined;
+    difficulty?: string | undefined;
     question_count?: number | undefined;
     timer?: number;
 }

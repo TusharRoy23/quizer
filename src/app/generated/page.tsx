@@ -56,16 +56,6 @@ export default function GeneratedPage() {
         }
     };
 
-    // Function to get difficulty color
-    const getDifficultyColor = (difficulty: string) => {
-        switch (difficulty?.toLowerCase()) {
-            case 'easy': return 'text-green-600 bg-green-100 dark:bg-green-900/30';
-            case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
-            case 'hard': return 'text-red-600 bg-red-100 dark:bg-red-900/30';
-            default: return 'text-gray-600 bg-gray-100 dark:bg-gray-800';
-        }
-    };
-
     return (
         <div className="rounded-2xl border border-gray-200 bg-white px-4 py-6 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:py-8 lg:px-8 lg:py-10">
             <div className="w-full max-w-[630px] text-center mx-auto mb-8">
@@ -111,9 +101,6 @@ export default function GeneratedPage() {
                                     <Calendar className="w-4 h-4 mr-1" />
                                     {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
                                 </div>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(log.difficulty)}`}>
-                                    {log.difficulty || 'Unknown'}
-                                </span>
                             </div>
 
                             {/* Stats Grid - Compact for 3 columns */}
@@ -242,9 +229,6 @@ export default function GeneratedPage() {
                                     <Calendar className="w-4 h-4 mr-1" />
                                     {log.created_at ? new Date(log.created_at).toLocaleDateString() : '-'}
                                 </div>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(log.difficulty)}`}>
-                                    {log.difficulty || 'Unknown'}
-                                </span>
                             </div>
 
                             {/* Stats Grid - Mobile Optimized */}

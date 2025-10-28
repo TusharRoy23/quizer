@@ -198,7 +198,7 @@ export default function Quiz({
 
             await audio.play();
             setIsPlaying(true);
-        } catch (error) {
+        } catch {
             setError("❌ Please interact with the page to play audio.");
             setIsPlaying(false);
         }
@@ -220,7 +220,7 @@ export default function Quiz({
                 // If no audio, start recording directly
                 await startTimerAndRecording();
             }
-        } catch (error) {
+        } catch {
             setError("🎤 Microphone permission denied. Please allow access.");
         }
     };

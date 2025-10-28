@@ -54,7 +54,7 @@ const GeneratedQuizList = ({
             paramsStr += `&query=${encodeURIComponent(queryParam)}`;
         }
         router.push(paramsStr);
-    }, [quizList.length, router]);
+    }, [quizList.length, router, isItForSearch, queryParam]);
 
     // Animation variants
     const containerVariants = {
@@ -210,7 +210,7 @@ const GeneratedQuizList = ({
                                 transition={{ delay: 0.4 }}
                                 className="text-gray-600 dark:text-gray-300 mb-8"
                             >
-                                It looks like you haven't generated any quizzes yet. Start creating amazing quizzes to test your knowledge!
+                                It looks like you have not generated any quizzes yet. Start creating amazing quizzes to test your knowledge!
                             </motion.p>
 
                             {/* Action Buttons */}

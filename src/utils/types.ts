@@ -1,3 +1,5 @@
+import { AgenticRole } from "./enum";
+
 export interface Authentication {
     authenticated: boolean;
     expiredAt: number;
@@ -52,7 +54,7 @@ export interface UserInfo {
 export interface QuizRequest {
     department: string | undefined;
     topics: string[];
-    difficulty: string | undefined;
+    difficulty?: string | undefined;
     question_count?: number | undefined;
     timer?: number;
 }
@@ -144,4 +146,11 @@ export interface IStep {
     form: IForm,
     departmentList: Department[],
     topicList: Topic[],
+}
+
+export interface QuestionDiscussionMessage {
+    uuid?: string;
+    role: AgenticRole;
+    message: string;
+    created_at?: Date;
 }

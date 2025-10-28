@@ -45,18 +45,20 @@ const SummaryData = ({ isVerbal = false }: { isVerbal?: boolean }) => {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                            <TableRow>
-                                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                        Difficulty
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-5 py-4 text-start">
-                                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {difficulty?.name}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                            {isVerbal &&
+                                <TableRow>
+                                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                            Difficulty
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="px-5 py-4 text-start">
+                                        <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            {difficulty?.name}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            }
                             {!isVerbal &&
                                 <TableRow>
                                     <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -106,7 +108,7 @@ export default function Summary({ onPreviousStep, isVerbal = false }: StepProps)
         setIsGenerating(true);
         setError(null);
 
-        if (!form.department || !form.topics || !form.difficulty) {
+        if (!form.department || !form.topics || (isVerbal && !form.difficulty)) {
             console.error("Please fill all the required fields before generating the quiz.");
             setIsGenerating(false);
             return;
@@ -119,11 +121,12 @@ export default function Summary({ onPreviousStep, isVerbal = false }: StepProps)
             const payload: QuizRequest = {
                 department: department?.uuid,
                 topics: topics?.map((topic: Topic) => topic.uuid),
-                difficulty: difficulty?.value,
             };
             if (!isVerbal) {
                 payload['question_count'] = form?.questionCount ? +form?.questionCount?.value : 5;
                 payload['timer'] = form.timer;
+            } else {
+                payload['difficulty'] = difficulty?.value;
             }
             const quizUuid = isVerbal ? await QuizService.generateVerbalQuiz(payload) : await QuizService.generateQuiz(payload);
 

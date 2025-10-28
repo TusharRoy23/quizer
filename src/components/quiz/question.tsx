@@ -5,6 +5,7 @@ import Checkbox from "../form/Checkbox";
 import MarkdownRenderer from "../common/MarkdownRenderer";
 import { QuizService } from "@/services/quizService";
 import { useState, useEffect, useRef } from "react";
+import DiscussQuestion from "./DiscussQuestion";
 
 interface QuestionProps {
     quiz: Quiz;
@@ -18,6 +19,7 @@ export default function Question({ quiz, onSelect, canSelect, onReturn }: Questi
     const [isStreaming, setIsStreaming] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [streamError, setStreamError] = useState<string | null>(null);
+    const [isChatOpen, setIsChatOpen] = useState(false);
     const abortControllerRef = useRef<(() => void) | null>(null);
 
     // Start streaming when component mounts and conditions are met
@@ -57,14 +59,14 @@ export default function Question({ quiz, onSelect, canSelect, onReturn }: Questi
                     setIsStreaming(true);
                     setIsTyping(true);
                 },
-                (error) => {
+                () => {
                     setIsStreaming(false);
                     setIsTyping(false);
                     setStreamError('Failed to stream explanation');
                 }
             );
 
-        } catch (error) {
+        } catch {
             setIsStreaming(false);
             setIsTyping(false);
             setStreamError('Failed to start streaming');
@@ -173,8 +175,31 @@ export default function Question({ quiz, onSelect, canSelect, onReturn }: Questi
                             )}
                         </div>
                     )}
+
+                    {/* Chat Button */}
+                    {
+                        !canSelect && (quiz.explanation || fullExplanation) && <div className="mt-4 flex justify-end">
+                            <button
+                                onClick={() => setIsChatOpen(true)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                            >
+                                <span>💬</span>
+                                <span>{"Let's Discuss"}</span>
+                            </button>
+                        </div>
+                    }
+
                 </div>
             </ComponentCard>
+
+            {/* Chat Box */}
+            {
+                !canSelect && (quiz.explanation || fullExplanation) && <DiscussQuestion
+                    quiz={quiz}
+                    isOpen={isChatOpen}
+                    onClose={() => setIsChatOpen(false)}
+                />
+            }
         </>
     )
 }

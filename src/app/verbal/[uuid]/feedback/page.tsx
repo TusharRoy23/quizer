@@ -23,7 +23,7 @@ export default function VerbalQuizFeedback() {
     const logUUID = params?.uuid as string || "";
     const pageParam = searchParams.get("page");
 
-    const { data: questionList = [], isLoading, error, isError } = useQuery<OralQuestion[]>({
+    const { data: questionList = [], isLoading, isError } = useQuery<OralQuestion[]>({
         queryKey: ["verbalQuestionFeedback", logUUID],
         queryFn: () => QuizService.getVervalQuestionFeedback(logUUID),
         enabled: !!logUUID,
@@ -50,7 +50,7 @@ export default function VerbalQuizFeedback() {
 
     const handlePageChange = useCallback((newPage: number) => {
         const validatedPage = Math.max(1, Math.min(newPage, questionList.length));
-        let paramsStr = `?page=${validatedPage}`;
+        const paramsStr = `?page=${validatedPage}`;
         router.push(paramsStr);
     }, [questionList.length, router]);
 
@@ -188,7 +188,7 @@ export default function VerbalQuizFeedback() {
                                 transition={{ delay: 0.4 }}
                                 className="text-gray-600 dark:text-gray-300 mb-8"
                             >
-                                It looks like you haven't generated any quizzes yet. Start creating amazing quizzes to test your knowledge!
+                                It looks like you have not generated any quizzes yet. Start creating amazing quizzes to test your knowledge!
                             </motion.p>
 
                             {/* Action Buttons */}

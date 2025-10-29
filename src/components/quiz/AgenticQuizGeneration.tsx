@@ -90,7 +90,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
 
     const submitUserReply = async () => {
         const reply = inputRef.current?.value.trim();
-        if (!reply || isStreaming || reply.length > 25) return;
+        if (!reply || isStreaming || reply.length > 50) return;
 
         setMessages((old = []) => [...old, { role: AgenticRole.USER, message: reply }])
 

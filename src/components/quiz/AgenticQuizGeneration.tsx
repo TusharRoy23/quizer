@@ -110,7 +110,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
                     if (data.next_step === AgenticNextStep.END) {
                         setShowBackdrop(true);
                     }
-                }, 0);
+                }, 1300);
                 inputRef.current?.focus();
             }
         } catch (error) {

@@ -1,4 +1,4 @@
-import { AgenticRole } from "./enum";
+import { AgenticNextStep, AgenticRole } from "./enum";
 
 export interface Authentication {
     authenticated: boolean;
@@ -153,4 +153,10 @@ export interface QuestionDiscussionMessage {
     role: AgenticRole;
     message: string;
     created_at?: Date;
+}
+
+export interface AgentStepState {
+    content: string | null;
+    next_step: AgenticNextStep;
+    role: AgenticRole;
 }

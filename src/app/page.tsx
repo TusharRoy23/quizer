@@ -1,6 +1,5 @@
 "use client"
 import Department from "@/components/steps/Department";
-import Difficulty from "@/components/steps/Difficulty";
 import Intro from "@/components/steps/Intro";
 import QuestionCount from "@/components/steps/QuestionCount";
 import Summary from "@/components/steps/Summary";
@@ -17,12 +16,15 @@ import { STEPS } from "@/utils/enum";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { QuizService } from "@/services/quizService";
+import { useState } from "react";
+import AgenticQuizGeneration from "@/components/quiz/AgenticQuizGeneration";
 
 export default function Home() {
   const step = useSelector((state: RootState) => state.steps.step);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { data: hasParticipatedInQuiz } = useQuery<boolean>({
     queryKey: ['hasParticipatedInQuiz'],
@@ -118,8 +120,39 @@ export default function Home() {
                 </div>
               </motion.div>
             )}
+            {isAuthenticated && String(step) === STEPS.Intro && (
+              <motion.div
+                key={'agentic-quiz-buttons'}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="mt-6 space-y-3"
+              >
+                <div className="flex justify-center">
+                  <Button
+                    size="md"
+                    variant="outline"
+                    className="border-2 border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/30 hover:animate-none w-full max-w-xs"
+                    endIcon={
+                      <div className="ml-2 flex items-center">
+                        <File className="w-4 h-4" />
+                        <span className="ml-1">📚</span>
+                      </div>
+                    }
+                    onClick={() => setIsChatOpen(true)}
+                  >
+                    Take a quiz with agent
+                  </Button>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </AnimatePresence>
+        <AgenticQuizGeneration
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+        ></AgenticQuizGeneration>
       </main>
     </div>
   );

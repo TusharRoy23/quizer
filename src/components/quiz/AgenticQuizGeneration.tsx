@@ -5,11 +5,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QuizService } from "@/services/quizService";
 import MessageBubble from "./MessageBubble";
 import StreamingBubble from "./StreamingBubble";
-import { QuestionDiscussionMessage } from "@/utils/types";
+import { QuestionDiscussionMessage, QuizRequest } from "@/utils/types";
 import { AgenticNextStep, AgenticRole } from "@/utils/enum";
+import { useDispatch } from "react-redux";
+import { setSearchEnable } from "@/store/reducers/searchSlice";
+import FullScreenLoader from "../common/FullScreenLoader";
 
 export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
     const [isStreaming, setIsStreaming] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
     const [streamingMessage, setStreamingMessage] = useState("");
     const [messages, setMessages] = useState<QuestionDiscussionMessage[]>([]);
     const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
@@ -18,6 +22,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
     const [hasInitialScroll, setHasInitialScroll] = useState(false);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const queryClient = useQueryClient();
+    const dispatch = useDispatch();
 
     const mutation = useMutation<QuestionDiscussionMessage[]>({
         mutationFn: async () => {
@@ -50,6 +55,13 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
         }, 100);
         return () => clearTimeout(handle);
     }, [messages, streamingMessage]);
+
+    // focus on textarea when streamng is done
+    useEffect(() => {
+        if (!isStreaming) {
+            inputRef.current?.focus();
+        }
+    }, [isStreaming]);
 
     // Force scroll to bottom on initial load when modal opens and messages are loaded
     useEffect(() => {
@@ -90,7 +102,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
 
     const submitUserReply = async () => {
         const reply = inputRef.current?.value.trim();
-        if (!reply || isStreaming || reply.length > 50) return;
+        if (!reply || isStreaming || reply.length > 120) return;
 
         setMessages((old = []) => [...old, { role: AgenticRole.USER, message: reply }])
 
@@ -102,16 +114,23 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
 
         try {
             const data = await QuizService.submitAgenticQuizGenerationReply({ message: reply });
-            if (data.next_step === AgenticNextStep.QUIZ) {
-                window.location.href = `/quiz/${data.content}`;
+            if (data.next_step === AgenticNextStep.QUIZ && typeof data.content === "object" && data.content !== null) {
+                generateQuiz({
+                    department: data.content.department,
+                    topics: data.content.topics,
+                    timer: data.content.timer,
+                    question_count: data.content.question_count
+                } as QuizRequest);
             } else {
-                setMessages((old = []) => [...old, { role: data.role, message: data?.content || '' }])
+                if (typeof data.content === "string") {
+                    setMessages((old = []) => [...old, { role: data.role, message: data?.content as string || '' }])
+                }
+
                 setTimeout(() => {
                     if (data.next_step === AgenticNextStep.END) {
                         setShowBackdrop(true);
                     }
                 }, 1300);
-                inputRef.current?.focus();
             }
         } catch (error) {
             const errorMessage: QuestionDiscussionMessage = {
@@ -129,6 +148,29 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
         }
     }
 
+    const generateQuiz = async (payload: QuizRequest) => {
+        setIsGenerating(true);
+        dispatch(setSearchEnable(false));
+        try {
+            const quizUuid = await QuizService.generateQuiz(payload);
+            if (quizUuid) {
+                onModalClose();
+                window.location.href = `/quiz/${quizUuid}`;
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                // Need Proper error validation
+            }
+        } finally {
+            setIsGenerating(false);
+            setSearchEnable(true);
+        }
+    }
+
+    if (isGenerating) {
+        return <FullScreenLoader isGenerating />;
+    }
+
     const clearMessages = () => {
         setMessages([]);
     }
@@ -136,7 +178,6 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
     const startNewChat = () => {
         clearMessages();
         setShowBackdrop(false);
-        // refetch();
         mutation.mutate();
     }
 

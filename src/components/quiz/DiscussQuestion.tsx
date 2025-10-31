@@ -56,6 +56,13 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
         }
     }, [isOpen]);
 
+    // focus on textarea when streamng is done
+    useEffect(() => {
+        if (!isStreaming) {
+            inputRef.current?.focus();
+        }
+    }, [isStreaming]);
+
     const renderedMessages = useMemo(() => (
         <>
             {messages.map((message, index) => (
@@ -222,7 +229,7 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
                         )}
                     </>
                 )}
-                <div ref={messagesEndRef} />
+                {messages.length > 0 && <div ref={messagesEndRef} />}
             </div>
         </AgenticDiscussionModal>
     );

@@ -156,7 +156,7 @@ export interface QuestionDiscussionMessage {
 }
 
 export interface AgentStepState {
-    content: string | null;
+    content: string | QuizRequest | null;
     next_step: AgenticNextStep;
     role: AgenticRole;
 }

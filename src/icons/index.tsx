@@ -22,6 +22,7 @@ import HomeIcon from "./home.svg";
 import SearchListIcon from "./search-list.svg";
 import PlusIcon from "./plus.svg";
 import PlusSquare from "./plus-square.svg";
+import Bot from "./bot.svg";
 
 export {
     PaperPlaneIcon,
@@ -47,5 +48,6 @@ export {
     HomeIcon,
     SearchListIcon,
     PlusIcon,
-    PlusSquare
+    PlusSquare,
+    Bot
 }

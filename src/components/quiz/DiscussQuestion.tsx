@@ -5,6 +5,7 @@ import { QuizService } from "@/services/quizService";
 import { AgenticRole } from "@/utils/enum";
 import MessageBubble from "./MessageBubble";
 import StreamingBubble from "./StreamingBubble";
+import AgenticDiscussionModal from "../ui/modal/AgenticDiscussionModal";
 
 interface ChatBoxProps {
     quiz: Quiz;
@@ -18,7 +19,6 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const abortControllerRef = useRef<(() => void) | null>(null);
     const [hasInitialScroll, setHasInitialScroll] = useState(false);
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const queryClient = useQueryClient();
 
@@ -55,6 +55,13 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
             setHasInitialScroll(false);
         }
     }, [isOpen]);
+
+    // focus on textarea when streamng is done
+    useEffect(() => {
+        if (!isStreaming) {
+            inputRef.current?.focus();
+        }
+    }, [isStreaming]);
 
     const renderedMessages = useMemo(() => (
         <>
@@ -168,97 +175,62 @@ export default function ChatBox({ quiz, isOpen, onClose }: ChatBoxProps) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            {/* Glass morphism chat container */}
-            <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col border border-white/20 dark:border-gray-700/50">
-                {/* Header with gradient */}
-                <div className="flex justify-between items-center p-6 border-b border-white/30 dark:border-gray-700/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-t-2xl">
-                    <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full animate-pulse ${isStreaming ? 'bg-yellow-400' : 'bg-green-400'}`}></div>
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Question Discussion
-                        </h3>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/50 transition-all duration-200 group"
-                        disabled={isStreaming}
-                    >
-                        <span className="text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors text-lg">
-                            ×
-                        </span>
-                    </button>
-                </div>
+        <AgenticDiscussionModal
+            inputRef={inputRef}
+            isLoading={isLoading}
+            isStreaming={isStreaming}
+            modalHeader="Question Discussion"
+            onClose={onClose}
+            handleKeyPress={handleKeyPress}
+        >
+            {/* Question preview */}
+            <div className="px-6 py-3 bg-blue-50/50 dark:bg-blue-900/20 border-b border-white/30 dark:border-gray-700/50">
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                    <span className="font-semibold">Q:</span> {quiz.question}
+                </p>
+            </div>
 
-                {/* Question preview */}
-                <div className="px-6 py-3 bg-blue-50/50 dark:bg-blue-900/20 border-b border-white/30 dark:border-gray-700/50">
-                    <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                        <span className="font-semibold">Q:</span> {quiz.question}
-                    </p>
-                </div>
-
-                {/* Messages area */}
-                <div
-                    ref={messagesContainerRef}
-                    className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-transparent to-white/20 dark:to-gray-800/20">
-                    {messages.length === 0 && !isStreaming ? (
-                        <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                            <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                                <span className="text-2xl">💬</span>
-                            </div>
-                            <div>
-                                <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                    Start a Discussion
-                                </h4>
-                                <p className="text-gray-500 dark:text-gray-400 max-w-sm">
-                                    Ask questions about this problem, discuss solutions, or get clarification on concepts.
-                                </p>
-                            </div>
+            {/* Messages area */}
+            <div
+                className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-transparent to-white/20 dark:to-gray-800/20">
+                {messages.length === 0 && !isStreaming ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                        <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                            <span className="text-2xl">💬</span>
                         </div>
-                    ) : (
-                        <>
-                            {renderedMessages}
-                            {/* Loading indicator when starting stream */}
-                            {isStreaming && !streamingMessage && (
-                                <div className="flex justify-start animate-modal-fade-in">
-                                    <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/30 dark:border-gray-600/30 shadow-lg">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <span className="text-xs text-white">Q</span>
-                                            </div>
-                                            <div className="flex space-x-1">
-                                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                            </div>
+                        <div>
+                            <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Start a Discussion
+                            </h4>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                                Ask questions about this problem, discuss solutions, or get clarification on concepts.
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {renderedMessages}
+                        {/* Loading indicator when starting stream */}
+                        {isStreaming && !streamingMessage && (
+                            <div className="flex justify-start animate-modal-fade-in">
+                                <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/30 dark:border-gray-600/30 shadow-lg">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-white">Q</span>
+                                        </div>
+                                        <div className="flex space-x-1">
+                                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                                         </div>
                                     </div>
                                 </div>
-                            )}
-                        </>
-                    )}
-                    <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input area */}
-                <div className="p-6 border-t border-white/30 dark:border-gray-700/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-b-2xl">
-                    <div className="flex space-x-3">
-                        <div className="flex-1 relative">
-                            <textarea
-                                ref={inputRef}
-                                onKeyUp={handleKeyPress}
-                                placeholder={isStreaming ? "Quizer is responding..." : "Type your message... (Press Enter to send)"}
-                                className="w-full border border-gray-300/50 dark:border-gray-600/50 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm resize-none transition-all duration-200 placeholder-gray-500 dark:placeholder-gray-400 pr-12 disabled:opacity-50"
-                                rows={2}
-                                disabled={isStreaming || isLoading}
-                            />
-                            <div className="absolute right-3 bottom-3 text-xs text-gray-400">
-                                ↵ Enter
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        )}
+                    </>
+                )}
+                {messages.length > 0 && <div ref={messagesEndRef} />}
             </div>
-        </div>
+        </AgenticDiscussionModal>
     );
 }

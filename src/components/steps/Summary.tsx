@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/store";
 import { QuizService } from "@/services/quizService";
 import { setSearchEnable } from "@/store/reducers/searchSlice";
+import FullScreenLoader from "../common/FullScreenLoader";
 
 const SummaryData = ({ isVerbal = false }: { isVerbal?: boolean }) => {
     const selector = useSelector((state: RootState) => state[isVerbal ? 'verbalSteps' : 'steps']);
@@ -158,17 +159,7 @@ export default function Summary({ onPreviousStep, isVerbal = false }: StepProps)
             />
 
             {/* Fullscreen Loader */}
-            {isGenerating && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-black/70">
-                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="mt-6 text-lg font-semibold text-gray-700 dark:text-gray-200">
-                        Generating your quiz…
-                    </p>
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        This may take a few minutes ⏳
-                    </p>
-                </div>
-            )}
+            <FullScreenLoader isGenerating />
         </div>
     );
 }

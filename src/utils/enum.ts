@@ -28,3 +28,10 @@ export enum AgenticRole {
     ASSISTANT = 'ASSISTANT',
     SYSTEM = 'SYSTEM'
 }
+
+export enum AgenticNextStep {
+    START = 'START',
+    INTERRUPT = 'INTERRUPT',
+    QUIZ = 'QUIZ',
+    END = 'END'
+}

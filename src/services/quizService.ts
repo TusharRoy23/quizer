@@ -1,7 +1,16 @@
 import { apiClient, callRefreshToken, isAccessTokenExpiringSoon } from "@/hooks/baseApi";
-import { OralQuestion, PaginatedResponse, QuestionDiscussionMessage, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
+import { AgentStepState, OralQuestion, PaginatedResponse, QuestionDiscussionMessage, QuestionKeyword, Quiz, QuizRequest, QuizResult, QuizTimer } from "@/utils/types";
 import { CommonService } from "./commonService"
 import { env } from "@/lib/env";
+
+type StreamedResponseProps = {
+    apiUrl: string;
+    payload?: any;
+    method: 'POST' | 'GET',
+    onComplete: (fullText: string) => void,
+    onChunk: (chunk: string) => void,
+    onError: (error: Error) => void
+}
 
 // Create a utility function to check and refresh token
 const ensureValidToken = async (): Promise<void> => {
@@ -9,6 +18,71 @@ const ensureValidToken = async (): Promise<void> => {
         await callRefreshToken();
     }
 };
+
+const getStreamedResponse = async ({ apiUrl, payload, method, onComplete, onChunk, onError }: StreamedResponseProps): Promise<() => void> => {
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    try {
+        // Ensure we have a valid token before making the request
+        await ensureValidToken();
+        const options: any = {
+            method: method,
+            credentials: 'include'
+        };
+
+        if (method === 'POST') {
+            options.headers = {
+                'Content-Type': 'application/json'
+            };
+            if (payload) {
+                options.body = JSON.stringify(payload);
+            }
+        }
+        const response = await fetch(`${env.apiUrl}/${apiUrl}`, options);
+
+        if (!response.ok) {
+            throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
+        }
+
+        if (!response.body) {
+            throw new Error('Response body is null');
+        }
+
+        reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '';
+
+        const processStream = async () => {
+            try {
+                while (true) {
+                    const { done, value } = await reader!.read();
+
+                    if (done) {
+                        onComplete(fullText); // Send complete text at once
+                        break;
+                    }
+
+                    const textChunk = decoder.decode(value, { stream: true });
+                    fullText += textChunk;
+                    onChunk(textChunk);
+                }
+            } catch (error) {
+                onError(error as Error);
+            } finally {
+                reader!.releaseLock();
+            }
+        };
+
+        processStream();
+
+        return () => {
+            reader!.cancel().catch(() => { });
+        };
+
+    } catch (error) {
+        onError(error as Error);
+        return () => { };
+    }
+}
 
 export const QuizService = {
     getQuizList: async (uuid: string) => {
@@ -76,54 +150,14 @@ export const QuizService = {
         onChunk: (chunk: string) => void,
         onError: (error: Error) => void
     ): Promise<() => void> => {
-        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
         try {
-            // Ensure we have a valid token before making the request
-            await ensureValidToken();
-            const response = await fetch(`${env.apiUrl}/question/explanation/${apiUrl}`, {
+            return await getStreamedResponse({
+                apiUrl: `question/explanation/${apiUrl}`,
                 method: 'GET',
-                credentials: 'include',
+                onComplete,
+                onChunk,
+                onError
             });
-
-            if (!response.ok) {
-                throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
-            }
-
-            if (!response.body) {
-                throw new Error('Response body is null');
-            }
-
-            reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            const processStream = async () => {
-                try {
-                    while (true) {
-                        const { done, value } = await reader!.read();
-
-                        if (done) {
-                            onComplete(fullText); // Send complete text at once
-                            break;
-                        }
-
-                        const textChunk = decoder.decode(value, { stream: true });
-                        fullText += textChunk;
-                        onChunk(textChunk);
-                    }
-                } catch (error) {
-                    onError(error as Error);
-                } finally {
-                    reader!.releaseLock();
-                }
-            };
-
-            processStream();
-
-            return () => {
-                reader!.cancel().catch(() => { });
-            };
-
         } catch (error) {
             onError(error as Error);
             return () => { };
@@ -175,61 +209,40 @@ export const QuizService = {
         onChunk: (chunk: string) => void,
         onError: (error: Error) => void
     ): Promise<() => void> => {
-        let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
         try {
-            // Ensure we have a valid token before making the request
-            await ensureValidToken();
-            const response = await fetch(`${env.apiUrl}/question/explanation/agent/${questionUUID}`, {
+            return await getStreamedResponse({
+                apiUrl: `question/explanation/agent/${questionUUID}`,
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+                payload,
+                onComplete,
+                onChunk,
+                onError
             });
-
-            if (!response.ok) {
-                throw new Error(`Stream failed: ${response.status} ${response.statusText}`);
-            }
-
-            if (!response.body) {
-                throw new Error('Response body is null');
-            }
-
-            reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '';
-
-            const processStream = async () => {
-                try {
-                    while (true) {
-                        const { done, value } = await reader!.read();
-
-                        if (done) {
-                            onComplete(fullText); // Send complete text at once
-                            break;
-                        }
-
-                        const textChunk = decoder.decode(value, { stream: true });
-                        fullText += textChunk;
-                        onChunk(textChunk);
-                    }
-                } catch (error) {
-                    onError(error as Error);
-                } finally {
-                    reader!.releaseLock();
-                }
-            };
-
-            processStream();
-
-            return () => {
-                reader!.cancel().catch(() => { });
-            };
-
         } catch (error) {
             onError(error as Error);
             return () => { };
         }
+    },
+    getStreamedAgenticQuizGeneration: async (
+        onComplete: (fullText: string) => void,
+        onChunk: (chunk: string) => void,
+        onError: (error: Error) => void
+    ): Promise<() => void> => {
+        try {
+            return await getStreamedResponse({
+                apiUrl: `question/discussion/initialization`,
+                method: 'POST',
+                onComplete,
+                onChunk,
+                onError
+            });
+        } catch (error) {
+            onError(error as Error);
+            return () => { };
+        }
+    },
+    submitAgenticQuizGenerationReply: async (userReply: { message: string }) => {
+        const response = await apiClient.post<AgentStepState>(`question/discussion/generate/`, userReply);
+        return response.data;
     }
 };

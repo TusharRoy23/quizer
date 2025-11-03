@@ -24,6 +24,7 @@ Users can generate quizzes, interact with AI agents, and even simulate interview
 | Name        | version |
 | ------------|---------|
 | React      | 19.0.0     |
+| Next | 15.3.0 |
 | @tanstack/react-query | 5.83.0 |
 | Redux | 9.2.0 |
 | Redux-persist | 6.0.0 |

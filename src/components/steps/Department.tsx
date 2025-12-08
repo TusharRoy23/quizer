@@ -30,7 +30,7 @@ export default function DepartmentStep({ onNextStep = () => { }, onPreviousStep,
     return (
         <>
             <StepLayout
-                title={"Select your department"}
+                title={"Department"}
                 description={
                     <SelectInput
                         label="Select your department"

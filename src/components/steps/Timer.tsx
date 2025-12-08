@@ -31,7 +31,7 @@ export default function Timer({ onNextStep = () => { }, onPreviousStep }: StepPr
                         max={60}
                         defaultValue={timer}
                         onChange={onChange}
-                        placeholder="Enter time in minutes"
+                        placeholder="Type time (min)"
                     />
                 }
                 btnLabel={"Next"}

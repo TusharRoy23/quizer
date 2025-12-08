@@ -22,7 +22,7 @@ export default function DifficultyLevel({ onNextStep = () => { }, onPreviousStep
     return (
         <>
             <StepLayout
-                title={"Select Difficulty Level"}
+                title={"Difficulty Level"}
                 description={
                     <SelectInput
                         label="Level"

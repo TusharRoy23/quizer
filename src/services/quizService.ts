@@ -5,7 +5,7 @@ import { env } from "@/lib/env";
 
 type StreamedResponseProps = {
     apiUrl: string;
-    payload?: any;
+    payload?: unknown;
     method: 'POST' | 'GET',
     onComplete: (fullText: string) => void,
     onChunk: (chunk: string) => void,
@@ -24,7 +24,7 @@ const getStreamedResponse = async ({ apiUrl, payload, method, onComplete, onChun
     try {
         // Ensure we have a valid token before making the request
         await ensureValidToken();
-        const options: any = {
+        const options: RequestInit = {
             method: method,
             credentials: 'include'
         };

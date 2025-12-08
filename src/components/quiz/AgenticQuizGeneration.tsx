@@ -38,7 +38,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
                 (chunk) => {
                     setStreamingMessage(prev => prev + chunk);
                 },
-                (error) => {
+                () => {
                     setIsStreaming(false);
                     setStreamingMessage("");
                 }
@@ -132,7 +132,7 @@ export default function AgenticQuizGeneration({ isOpen, onClose }: { isOpen: boo
                     }
                 }, 1300);
             }
-        } catch (error) {
+        } catch {
             const errorMessage: QuestionDiscussionMessage = {
                 role: AgenticRole.ASSISTANT,
                 message: "Sorry, I encountered an error while processing your message. Please try again.",

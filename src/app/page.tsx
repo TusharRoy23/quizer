@@ -5,7 +5,6 @@ import QuestionCount from "@/components/steps/QuestionCount";
 import Summary from "@/components/steps/Summary";
 import Timer from "@/components/steps/Timer";
 import Topics from "@/components/steps/Topics";
-import Button from "@/components/ui/button/Button";
 import { RootState } from "@/store";
 import { setStep } from "@/store/reducers/stepSlice";
 import { useDispatch, useSelector } from "react-redux";

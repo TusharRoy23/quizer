@@ -1,7 +1,7 @@
 "use client";
 import ErrorDisplay from "@/components/error/errorDisplay";
 import Button from "@/components/ui/button/Button";
-import { CheckCircle, Clock, Trophy, CheckList, Star, CheckList2, CheckCircle2 } from "@/icons";
+import { CheckCircle, Clock, Trophy, CheckList, CheckList2, CheckCircle2 } from "@/icons";
 import { QuizService } from "@/services/quizService";
 import { QuizResult } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";

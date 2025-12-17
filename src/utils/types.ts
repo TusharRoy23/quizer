@@ -115,7 +115,7 @@ export interface ErrorResponse {
         message: string;
         error: Record<string, string[]>;
     };
-    meta: any;
+    meta: Record<string, unknown>;
     message: string;
     __isWrapped: boolean;
 }

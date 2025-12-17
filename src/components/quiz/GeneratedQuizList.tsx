@@ -46,7 +46,7 @@ const GeneratedQuizList = ({
         IsSetExplanation(quiz.explanation);
     }
 
-    const handlePageChange = useCallback((newPage: number) => {
+    const handlePageChange = (newPage: number) => {
         const validatedPage = Math.max(1, Math.min(newPage, quizList.length));
         IsSetExplanation(undefined);
         let paramsStr = `?page=${validatedPage}`;
@@ -54,7 +54,7 @@ const GeneratedQuizList = ({
             paramsStr += `&query=${encodeURIComponent(queryParam)}`;
         }
         router.push(paramsStr);
-    }, [quizList.length, router, isItForSearch, queryParam]);
+    };
 
     // Animation variants
     const containerVariants = {

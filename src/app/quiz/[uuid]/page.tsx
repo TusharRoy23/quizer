@@ -157,10 +157,10 @@ export default function QuizPage() {
         router.push(`/result/${uuid}`);
     }
 
-    const handlePageChange = useCallback((newDisplayPage: number) => {
+    const handlePageChange = (newDisplayPage: number) => {
         const validatedPage = Math.max(1, Math.min(newDisplayPage, quizList.length));
         router.push(`?page=${validatedPage}`);
-    }, [quizList.length, router]);
+    };
 
     // Add keyboard navigation
     useEffect(() => {
